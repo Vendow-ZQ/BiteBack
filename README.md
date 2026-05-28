@@ -17,18 +17,32 @@ BiteBack/
 ├── tsconfig.json           # TypeScript 配置
 ├── vite.config.ts          # Vite 配置
 ├── README.md               # 项目说明
-├── PRD.md                  # 产品需求文档
-├── SOP.md                  # 工程实现规范
-├── BattleLog.md            # PM 与 Leader 讨论记录
-├── Material.md             # 比赛材料
+├── docs/
+│   ├── PRD.md              # 产品需求文档
+│   ├── SOP.md              # 工程实现规范
+│   ├── BattleLog.md        # PM 与 Leader 讨论记录
+│   ├── Material.md         # 比赛材料
+│   └── reference/
+│       └── douyin-ui/      # 真实抖音界面参考截图，不参与运行时展示
+├── public/
+│   └── assets/             # Demo 展示素材（图片、视频）
+│       ├── covers/
+│       └── videos/
 └── src/
     ├── main.tsx            # React 入口
     ├── App.tsx             # 主应用组件
     ├── vite-env.d.ts       # Vite 类型声明
+    ├── config/
+    │   └── assets.ts       # 静态素材根路径与路径生成
+    ├── mocks/              # 可编辑 Demo 数据
+    │   ├── README.md
+    │   ├── user.ts         # 默认用户、搜索会话、Feed 状态
+    │   ├── foodMemories.ts # 收藏美食记忆资产
+    │   ├── feed.ts         # Feed 视频与互动数据
+    │   ├── search.ts       # 搜索建议与搜索结果数据
+    │   └── index.ts        # Mock 数据统一导出
     ├── types/
     │   └── index.ts        # 类型定义
-    ├── data/
-    │   └── mock.ts         # Mock 数据
     ├── utils/
     │   └── gates.ts        # 六大 Gate 逻辑
     └── components/
@@ -51,6 +65,14 @@ npm run dev
 # 构建生产版本
 npm run build
 ```
+
+## Mock 与资源配置
+
+- Demo 数据统一放在 `src/mocks/`，改搜索词、收藏店铺、Feed 视频、搜索结果都从这里改。
+- Demo 素材统一放在 `public/assets/`，不需要启动后端资源服务。
+- 资源路径统一放在 `src/config/assets.ts`，默认指向 `/assets`。
+- 如需切换资源根路径，可设置 `VITE_ASSET_BASE_PATH`，组件内不要直接写具体素材路径。
+- 真实抖音界面截图统一放在 `docs/reference/douyin-ui/`，只作为视觉参考，不放入 demo 素材池。
 
 ## Demo 演示流程
 
@@ -102,9 +124,10 @@ npm run build
 
 ## 项目文档
 
-- [PRD.md](PRD.md) - 产品需求文档
-- [SOP.md](SOP.md) - 工程实现规范
-- [BattleLog.md](BattleLog.md) - 产品决策讨论记录
+- [docs/PRD.md](docs/PRD.md) - 产品需求文档
+- [docs/SOP.md](docs/SOP.md) - 工程实现规范
+- [docs/BattleLog.md](docs/BattleLog.md) - 产品决策讨论记录
+- [docs/Material.md](docs/Material.md) - 比赛材料
 
 ## 开发团队
 

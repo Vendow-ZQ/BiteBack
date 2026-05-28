@@ -63,6 +63,23 @@ export interface FeedVideo {
   videoUrl?: string;
 }
 
+export interface EngagementStats {
+  likes: number;
+  comments: number;
+  shares: number;
+}
+
+export interface SearchResultCard {
+  id: string;
+  image: string;
+  title: string;
+  author: string;
+  date: string;
+  likes: number;
+  duration?: string;
+  multi?: boolean;
+}
+
 export interface FeedState {
   normalVideosConsumed: number;
   fastSwiping: boolean;
