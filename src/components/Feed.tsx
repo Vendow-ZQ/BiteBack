@@ -17,6 +17,17 @@ interface FeedProps {
   onSearchClick: () => void;
 }
 
+// 抖音风格的数字格式化
+function formatNumber(num: number): string {
+  if (num >= 10000) {
+    return (num / 10000).toFixed(1) + 'w';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'k';
+  }
+  return num.toString();
+}
+
 export default function Feed({
   videos,
   selectedMemory,
@@ -137,6 +148,11 @@ export default function Feed({
     const coverUrl = video.coverUrl || videoCovers[index % videoCovers.length];
     const isFirstVideo = index === 0;
 
+    // 模拟数据
+    const likes = [12.5, 8.3, 25.6, 3.2, 56.7][index % 5] * 10000;
+    const comments = [3200, 1100, 5800, 892, 12300][index % 5];
+    const shares = [1500, 892, 3200, 567, 8900][index % 5];
+
     return (
       <div
         key={video.id}
@@ -152,9 +168,13 @@ export default function Feed({
           background: '#000'
         }}
       >
-        <img
-          src={coverUrl}
-          alt={video.title || '视频'}
+        <video
+          src={video.videoUrl || coverUrl}
+          poster={video.coverUrl || coverUrl}
+          autoPlay
+          muted
+          loop
+          playsInline
           style={{
             width: '100%',
             height: '100%',
@@ -278,7 +298,7 @@ export default function Feed({
             bottom: 90,
             display: 'flex',
             flexDirection: 'column',
-            gap: 14,
+            gap: 12,
             alignItems: 'center',
             zIndex: 20
           }}
@@ -286,7 +306,7 @@ export default function Feed({
           {/* 头像 */}
           <div style={{
             position: 'relative',
-            marginBottom: 4
+            marginBottom: 8
           }}>
             <div style={{
               width: 48,
@@ -297,7 +317,8 @@ export default function Feed({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 20
+              fontSize: 20,
+              overflow: 'hidden'
             }}>
               👤
             </div>
@@ -308,87 +329,168 @@ export default function Feed({
               transform: 'translateX(-50%)',
               width: 18,
               height: 18,
-              background: '#FF3B30',
+              background: '#FE2C55',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 12,
-              border: '2px solid #000'
+              fontSize: 14,
+              border: '2px solid #000',
+              fontWeight: 'bold'
             }}>
               +
             </div>
           </div>
 
           {/* 点赞 */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            cursor: 'pointer'
+          }}>
             <div style={{
               width: 44,
               height: 44,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 32,
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+              justifyContent: 'center'
             }}>
-              🤍
+              <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                <path d="M24 42.5L21.26 40.03C10.86 30.64 4.5 24.94 4.5 17.95C4.5 12.23 8.93 7.8 14.65 7.8C17.94 7.8 21.09 9.33 23.13 11.71C25.17 9.33 28.32 7.8 31.61 7.8C37.33 7.8 41.76 12.23 41.76 17.95C41.76 24.94 35.4 30.64 25 40.03L24 42.5Z"
+                  fill="#fff"
+                  fillOpacity="0.95"
+                  stroke="#fff"
+                  strokeWidth="2"
+                />
+              </svg>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-              {['12.5w', '8.3w', '25.6w', '3.2w', '56.7w'][index % 5]}
+            <span style={{
+              fontSize: 11,
+              fontWeight: 600,
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+              color: '#fff'
+            }}>
+              {formatNumber(likes)}
             </span>
           </div>
 
           {/* 评论 */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            cursor: 'pointer'
+          }}>
             <div style={{
               width: 44,
               height: 44,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 28,
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+              justifyContent: 'center'
             }}>
-              💬
+              <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+                <path d="M12 10C12 8.89543 12.8954 8 14 8H34C35.1046 8 36 8.89543 36 10V30C36 31.1046 35.1046 32 34 32H28L20 40V32H14C12.8954 32 12 31.1046 12 30V10Z"
+                  fill="#fff"
+                  fillOpacity="0.95"
+                  stroke="#fff"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+                <circle cx="19" cy="20" r="2" fill="#000"/>
+                <circle cx="29" cy="20" r="2" fill="#000"/>
+              </svg>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-              {['3.2w', '1.1w', '5.8w', '8923', '12.3w'][index % 5]}
+            <span style={{
+              fontSize: 11,
+              fontWeight: 600,
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+              color: '#fff'
+            }}>
+              {formatNumber(comments)}
             </span>
           </div>
 
           {/* 收藏 */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            cursor: 'pointer'
+          }}>
             <div style={{
               width: 44,
               height: 44,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 28,
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+              justifyContent: 'center'
             }}>
-              ⭐
+              <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+                <path d="M12 6C12 4.89543 12.8954 4 14 4H34C35.1046 4 36 4.89543 36 6V42L24 35L12 42V6Z"
+                  fill="#fff"
+                  fillOpacity="0.95"
+                  stroke="#fff"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+            <span style={{
+              fontSize: 11,
+              fontWeight: 600,
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+              color: '#fff'
+            }}>
               收藏
             </span>
           </div>
 
           {/* 分享 */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            cursor: 'pointer'
+          }}>
             <div style={{
               width: 44,
               height: 44,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 26,
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+              justifyContent: 'center'
             }}>
-              ↗️
+              <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+                <path d="M38 20C41.3137 20 44 17.3137 44 14C44 10.6863 41.3137 8 38 8C34.6863 8 32 10.6863 32 14"
+                  stroke="#fff"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <path d="M38 20V36C38 38.2091 36.2091 40 34 40H14C11.7909 40 10 38.2091 10 36V22"
+                  stroke="#fff"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <path d="M16 14L10 20L4 14"
+                  stroke="#fff"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle cx="10" cy="20" r="3" fill="#fff"/>
+                <circle cx="38" cy="14" r="3" fill="#fff"/>
+              </svg>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-              {['1.5w', '8921', '3.2w', '567', '8.9w'][index % 5]}
+            <span style={{
+              fontSize: 11,
+              fontWeight: 600,
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+              color: '#fff'
+            }}>
+              {formatNumber(shares)}
             </span>
           </div>
 
@@ -404,7 +506,8 @@ export default function Feed({
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: 20,
-            animation: 'spin 4s linear infinite'
+            animation: 'spin 4s linear infinite',
+            overflow: 'hidden'
           }}>
             🎵
           </div>

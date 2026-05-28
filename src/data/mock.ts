@@ -17,32 +17,32 @@ export const defaultUserProfile: UserProfile = {
 
 // 搜索会话
 export const defaultSearchSession: SearchSession = {
-  query: '南科大附近晚饭',
-  queryIntent: 'food_decision',
-  searchedAt: Date.now(),
-  returnedToFeedAt: Date.now() + 2 * 60 * 1000, // 2分钟后返回
+  query: '',
+  queryIntent: 'other',
+  searchedAt: 0,
+  returnedToFeedAt: 0,
   completedPoiAction: false,
   completedDealAction: false,
   completedRouteAction: false
 };
 
-// Food Memory 资产（5条，包含1个不触发样例）
+// Food Memory 资产（5条，包含1个不触发样例）- 使用真实视频
 export const foodMemories: FoodMemory[] = [
   {
     memoryId: 'm_001',
     videoId: 'v_001',
-    coverUrl: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=600&fit=crop',
-    title: '这家牛肉面真的香迷糊了',
-    shopName: '老巷牛肉面',
+    coverUrl: 'http://localhost:8004/uploads/videos/video1.mp4',
+    title: '跟着学生吃人均不过20的10家小店',
+    shopName: '西丽旺棠夜市',
     poiId: 'poi_001',
     businessArea: '南科大',
-    category: '面馆',
-    dishTags: ['牛肉面', '红油抄手'],
+    category: '小吃',
+    dishTags: ['平价', '量大', '灌饼'],
     memoryLevel: 'A',
     memoryStrength: 0.82,
     poiConfidence: 0.91,
-    distanceM: 900,
-    price: 38,
+    distanceM: 1300,
+    price: 20,
     isOpen: true,
     shopQuality: 0.88,
     dealAvailable: true,
@@ -51,38 +51,38 @@ export const foodMemories: FoodMemory[] = [
   {
     memoryId: 'm_002',
     videoId: 'v_002',
-    coverUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=600&fit=crop',
-    title: '藏在巷子里的宝藏烧烤',
-    shopName: '深夜烧烤摊',
+    coverUrl: 'http://localhost:8004/uploads/videos/video2.mp4',
+    title: '南科大食堂吃一顿饭多少钱',
+    shopName: '南科大食堂',
     poiId: 'poi_002',
     businessArea: '南科大',
-    category: '烧烤',
-    dishTags: ['烤串', '啤酒'],
+    category: '食堂',
+    dishTags: ['学生餐', '实惠'],
     memoryLevel: 'S',
     memoryStrength: 0.95,
     poiConfidence: 0.89,
-    distanceM: 1200,
-    price: 65,
+    distanceM: 500,
+    price: 25,
     isOpen: true,
     shopQuality: 0.85,
-    dealAvailable: true,
+    dealAvailable: false,
     lastInteractionDays: 12
   },
   {
     memoryId: 'm_003',
     videoId: 'v_003',
-    coverUrl: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&h=600&fit=crop',
-    title: '广式早茶必吃',
-    shopName: '点都德',
+    coverUrl: 'http://localhost:8004/uploads/videos/video3.mp4',
+    title: '南科大学生餐厅上新奶龙炒饭',
+    shopName: '学生餐厅',
     poiId: 'poi_003',
-    businessArea: '科技园',
-    category: '粤菜',
-    dishTags: ['虾饺', '叉烧包'],
+    businessArea: '南科大',
+    category: '炒饭',
+    dishTags: ['创意菜', '网红'],
     memoryLevel: 'B',
     memoryStrength: 0.65,
     poiConfidence: 0.92,
-    distanceM: 2500,
-    price: 88,
+    distanceM: 600,
+    price: 35,
     isOpen: true,
     shopQuality: 0.90,
     dealAvailable: false,
@@ -91,18 +91,18 @@ export const foodMemories: FoodMemory[] = [
   {
     memoryId: 'm_004',
     videoId: 'v_004',
-    coverUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=600&fit=crop',
-    title: '日料放题天花板',
-    shopName: '极上寿司',
+    coverUrl: 'http://localhost:8004/uploads/videos/video4.mp4',
+    title: '南科大Vlog | 又是纯摆的一天',
+    shopName: '桃喜',
     poiId: 'poi_004',
-    businessArea: '海岸城',
-    category: '日料',
-    dishTags: ['寿司', '刺身'],
+    businessArea: '南科大',
+    category: '茶饮',
+    dishTags: ['下午茶', '甜品'],
     memoryLevel: 'A',
     memoryStrength: 0.78,
     poiConfidence: 0.87,
-    distanceM: 3500,
-    price: 198,
+    distanceM: 800,
+    price: 28,
     isOpen: false, // 不触发：店铺未营业
     shopQuality: 0.82,
     dealAvailable: true,
@@ -111,9 +111,9 @@ export const foodMemories: FoodMemory[] = [
   {
     memoryId: 'm_005',
     videoId: 'v_005',
-    coverUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=600&fit=crop',
-    title: '看着就饿的披萨',
-    shopName: '意式披萨屋',
+    coverUrl: 'http://localhost:8004/uploads/videos/video1.mp4',
+    title: '其他美食',
+    shopName: '其他店铺',
     poiId: 'poi_005',
     businessArea: '福田',
     category: '西餐',
@@ -130,14 +130,13 @@ export const foodMemories: FoodMemory[] = [
   }
 ];
 
-// Feed 视频列表
+// Feed 视频列表 - 使用真实视频
 export const feedVideos: FeedVideo[] = [
-  { id: 'f_001', type: 'video', title: '普通短视频 1', coverUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=700&fit=crop' },
-  { id: 'f_002', type: 'video', title: '普通短视频 2', coverUrl: 'https://images.unsplash.com/photo-1566554273541-37a9ca77b91f?w=400&h=700&fit=crop' },
+  { id: 'f_001', type: 'video', title: '南科大美食探店 | 今天吃什么', videoUrl: 'http://localhost:8004/uploads/videos/video1.mp4', coverUrl: 'http://localhost:8004/uploads/covers/20260528-151201.jpg' },
+  { id: 'f_002', type: 'video', title: '学校食堂测评 | 南科大干饭日记', videoUrl: 'http://localhost:8004/uploads/videos/video2.mp4', coverUrl: 'http://localhost:8004/uploads/covers/20260528-151223.jpg' },
   { id: 'biteback_slot', type: 'biteback' },
-  { id: 'f_003', type: 'video', title: '普通短视频 3', coverUrl: 'https://images.unsplash.com/photo-1588953936179-d2a4734c8bda?w=400&h=700&fit=crop' },
-  { id: 'f_004', type: 'video', title: '普通短视频 4', coverUrl: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=700&fit=crop' },
-  { id: 'f_005', type: 'video', title: '普通短视频 5', coverUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=700&fit=crop' }
+  { id: 'f_003', type: 'video', title: '深圳美食推荐 | 周末去哪儿吃', videoUrl: 'http://localhost:8004/uploads/videos/video3.mp4', coverUrl: 'http://localhost:8004/uploads/covers/20260528-151229.jpg' },
+  { id: 'f_004', type: 'video', title: '大学生日常 | 干饭人的一天', videoUrl: 'http://localhost:8004/uploads/videos/video4.mp4', coverUrl: 'http://localhost:8004/uploads/covers/20260528-151234.jpg' }
 ];
 
 // Feed 状态

@@ -409,17 +409,160 @@ export default function App() {
             <SearchPage onSearch={handleSearch} onCancel={() => setShowSearch(false)} />
           )}
 
+          {/* 底部导航栏 - 抖音风格 */}
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 50,
+            background: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(20px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            padding: '0 10px',
+            paddingBottom: 4,
+            zIndex: 100,
+            borderTop: '1px solid rgba(255,255,255,0.05)'
+          }}>
+            {/* 首页 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+              cursor: 'pointer'
+            }}>
+              <div style={{
+                width: 28,
+                height: 28,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative'
+              }}>
+                <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
+                  <path d="M8 20L24 8L40 20V40C40 41.1046 39.1046 42 38 42H10C8.89543 42 8 41.1046 8 40V20Z" fill="#fff" stroke="#fff" strokeWidth="3" strokeLinejoin="round"/>
+                  <path d="M20 42V28H28V42" stroke="#000" strokeWidth="3" strokeLinejoin="round"/>
+                </svg>
+                {/* 加号 */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 10,
+                  height: 10,
+                  background: '#fff',
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 2
+                }}>
+                  <span style={{ color: '#000', fontSize: 10, fontWeight: 'bold', lineHeight: 1 }}>+</span>
+                </div>
+              </div>
+              <span style={{ fontSize: 10, color: '#fff', fontWeight: 500 }}>首页</span>
+            </div>
+
+            {/* 朋友 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+              cursor: 'pointer',
+              position: 'relative'
+            }}>
+              <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+                <circle cx="18" cy="16" r="8" stroke="#fff" strokeWidth="3" fill="none"/>
+                <path d="M4 40C4 30.0589 11.1634 22 20 22H22" stroke="#fff" strokeWidth="3" strokeLinecap="round"/>
+                <circle cx="36" cy="14" r="6" stroke="#fff" strokeWidth="3" fill="none"/>
+                <path d="M28 38C28 30.268 33.3726 24 40 24" stroke="#fff" strokeWidth="3" strokeLinecap="round"/>
+              </svg>
+              {/* 红点 */}
+              <div style={{
+                position: 'absolute',
+                top: 2,
+                right: 2,
+                width: 8,
+                height: 8,
+                background: '#FE2C55',
+                borderRadius: '50%',
+                border: '2px solid #000'
+              }} />
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>朋友</span>
+            </div>
+
+            {/* 发布按钮（中间大按钮） */}
+            <div style={{
+              width: 42,
+              height: 32,
+              background: 'linear-gradient(135deg, #25F4EE 0%, #FE2C55 100%)',
+              borderRadius: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
+                <path d="M24 10V38M10 24H38" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
+              </svg>
+            </div>
+
+            {/* 消息 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+              cursor: 'pointer'
+            }}>
+              <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+                <path d="M8 14C8 12.8954 8.89543 12 10 12H38C39.1046 12 40 12.8954 40 14V34C40 35.1046 39.1046 36 38 36H10C8.89543 36 8 35.1046 8 34V14Z" stroke="#fff" strokeWidth="3" fill="none"/>
+                <path d="M8 16L24 26L40 16" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>消息</span>
+            </div>
+
+            {/* 我 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+              cursor: 'pointer'
+            }}>
+              <div style={{
+                width: 26,
+                height: 26,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 16,
+                border: '1px solid rgba(255,255,255,0.3)'
+              }}>
+                👤
+              </div>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>我</span>
+            </div>
+          </div>
+
           {/* Home 指示条 */}
           <div style={{
             position: 'absolute',
-            bottom: 8,
+            bottom: 4,
             left: '50%',
             transform: 'translateX(-50%)',
             width: 134,
             height: 5,
             background: 'rgba(255,255,255,0.3)',
             borderRadius: 3,
-            zIndex: 50
+            zIndex: 110
           }} />
         </div>
       </div>

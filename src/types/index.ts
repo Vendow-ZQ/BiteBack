@@ -60,6 +60,7 @@ export interface FeedVideo {
   type: 'video' | 'biteback';
   title?: string;
   coverUrl?: string;
+  videoUrl?: string;
 }
 
 export interface FeedState {

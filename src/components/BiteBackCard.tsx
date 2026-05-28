@@ -68,11 +68,15 @@ export default function BiteBackCard({
         position: 'relative'
       }}
     >
-      {/* 视频封面 */}
+      {/* 视频背景 */}
       <div style={{ flex: 1, position: 'relative' }}>
-        <img
+        <video
           src={memory.coverUrl}
-          alt={memory.title}
+          poster={memory.coverUrl}
+          autoPlay
+          muted
+          loop
+          playsInline
           style={{
             width: '100%',
             height: '100%',
