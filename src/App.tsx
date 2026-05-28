@@ -247,7 +247,7 @@ export default function App() {
           overflow: 'hidden',
           position: 'relative'
         }}>
-          {/* 状态栏 */}
+          {/* 状态栏 - 抖音风格 */}
           <div style={{
             position: 'absolute',
             top: 0,
@@ -257,15 +257,61 @@ export default function App() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 20px',
+            padding: '0 18px 0 22px',
             zIndex: 50,
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 600
           }}>
             <span>9:41</span>
-            <div style={{ display: 'flex', gap: 4 }}>
-              <span>📶</span>
-              <span>🔋</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {/* 5G */}
+              <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: -0.5 }}>5G</span>
+              {/* 信号 */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-end',
+                gap: 1.5,
+                height: 12
+              }}>
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} style={{
+                    width: 2.5,
+                    height: 3 + i * 2,
+                    background: '#fff',
+                    borderRadius: 0.5
+                  }} />
+                ))}
+              </div>
+              {/* 电池 */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2
+              }}>
+                <div style={{
+                  width: 25,
+                  height: 12,
+                  border: '1.5px solid rgba(255,255,255,0.4)',
+                  borderRadius: 3,
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: 2
+                }}>
+                  <div style={{
+                    flex: 1,
+                    height: '100%',
+                    background: '#fff',
+                    borderRadius: 1
+                  }} />
+                </div>
+                <div style={{
+                  width: 1.5,
+                  height: 4,
+                  background: 'rgba(255,255,255,0.4)',
+                  borderRadius: '0 1px 1px 0'
+                }} />
+              </div>
             </div>
           </div>
 
@@ -276,8 +322,8 @@ export default function App() {
             showBiteBack={showBiteBack}
             searchSession={searchSession}
             feedState={feedState}
-            cardState={cardState}
-            metrics={metrics}
+            // cardState prop removed
+            // metrics prop removed
             isControlGroup={isControlGroup}
             onVideoConsumed={handleVideoConsumed}
             onCardAction={handleCardAction}

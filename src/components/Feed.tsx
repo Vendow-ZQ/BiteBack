@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import type { FeedVideo, FoodMemory, SearchSession, FeedState, CardState, Metrics } from '../types';
+import type { FeedVideo, FoodMemory, SearchSession, FeedState } from '../types';
 import { videoCovers } from '../data/mock';
 import BiteBackCard from './BiteBackCard';
 
@@ -8,9 +8,8 @@ interface FeedProps {
   selectedMemory: FoodMemory | null;
   showBiteBack: boolean;
   searchSession: SearchSession;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   feedState: FeedState;
-  cardState: CardState;
-  metrics: Metrics;
   isControlGroup: boolean;
   onVideoConsumed: () => void;
   onCardAction: (action: 'explanation' | 'add_to_today' | 'view_shop') => void;
@@ -23,7 +22,6 @@ export default function Feed({
   selectedMemory,
   showBiteBack,
   searchSession,
-  // feedState, // 保留供调试信息使用
   onVideoConsumed,
   onCardAction,
   onNegativeFeedback,
@@ -137,6 +135,7 @@ export default function Feed({
 
     // 普通视频
     const coverUrl = video.coverUrl || videoCovers[index % videoCovers.length];
+    const isFirstVideo = index === 0;
 
     return (
       <div
@@ -163,8 +162,8 @@ export default function Feed({
           }}
         />
 
-        {/* 顶部导航栏（仅在第一个视频显示） */}
-        {index === 0 && (
+        {/* 顶部导航栏 - 仿抖音设计 */}
+        {isFirstVideo && (
           <div
             style={{
               position: 'absolute',
@@ -175,24 +174,25 @@ export default function Feed({
               alignItems: 'center',
               justifyContent: 'center',
               gap: 30,
-              fontSize: 15,
-              zIndex: 20
+              fontSize: 16,
+              zIndex: 20,
+              fontWeight: 500
             }}
           >
-            <span style={{ opacity: 0.7 }}>关注</span>
-            <span style={{ fontWeight: 600 }}>推荐</span>
-            <span style={{ opacity: 0.7 }}>附近</span>
+            <span style={{ opacity: 0.6 }}>关注</span>
+            <span style={{ fontWeight: 700, fontSize: 17 }}>推荐</span>
+            <span style={{ opacity: 0.6 }}>附近</span>
           </div>
         )}
 
-        {/* 搜索按钮（仅在第一个视频显示） */}
-        {index === 0 && (
+        {/* 搜索按钮 - 抖音风格 */}
+        {isFirstVideo && (
           <button
             onClick={onSearchClick}
             style={{
               position: 'absolute',
               top: 44,
-              right: 16,
+              right: 12,
               background: 'rgba(255,255,255,0.15)',
               border: 'none',
               borderRadius: 20,
@@ -203,69 +203,210 @@ export default function Feed({
               display: 'flex',
               alignItems: 'center',
               gap: 4,
-              zIndex: 20
+              zIndex: 20,
+              backdropFilter: 'blur(10px)'
             }}
           >
-            🔍 搜索
+            <span style={{ fontSize: 14 }}>🔍</span>
+            <span>搜索</span>
           </button>
         )}
 
-        {/* 视频信息 */}
+        {/* 左侧视频信息 - 抖音风格 */}
         <div
           style={{
             position: 'absolute',
             bottom: 100,
-            left: 16,
+            left: 12,
             right: 80,
             color: '#fff',
-            textShadow: '0 1px 3px rgba(0,0,0,0.8)',
             zIndex: 20
           }}
         >
-          <div style={{ fontSize: 14, opacity: 0.8, marginBottom: 4 }}>
+          {/* 用户名 */}
+          <div style={{
+            fontSize: 15,
+            fontWeight: 600,
+            marginBottom: 8,
+            textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+          }}>
             @{video.id}
           </div>
-          <div style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.4 }}>
+
+          {/* 视频描述 */}
+          <div style={{
+            fontSize: 14,
+            lineHeight: 1.5,
+            marginBottom: 10,
+            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+            opacity: 0.95
+          }}>
             {video.title || '这是一条普通的抖音短视频内容，上下滑动查看更多'}
+          </div>
+
+          {/* 音乐信息 - 抖音特色 */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 13,
+            opacity: 0.9
+          }}>
+            <span style={{ fontSize: 12 }}>🎵</span>
+            <span style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: 200
+            }}>
+              原声 - @{video.id}
+            </span>
+            <span style={{
+              width: 60,
+              height: 1,
+              background: 'linear-gradient(90deg, #fff, transparent)',
+              marginLeft: 8
+            }} />
           </div>
         </div>
 
-        {/* 右侧互动按钮 */}
+        {/* 右侧互动按钮 - 抖音经典竖排 */}
         <div
           style={{
             position: 'absolute',
-            right: 10,
-            bottom: 100,
+            right: 8,
+            bottom: 90,
             display: 'flex',
             flexDirection: 'column',
-            gap: 16,
+            gap: 14,
             alignItems: 'center',
             zIndex: 20
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
-              ❤️
+          {/* 头像 */}
+          <div style={{
+            position: 'relative',
+            marginBottom: 4
+          }}>
+            <div style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: '2px solid #fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 20
+            }}>
+              👤
             </div>
-            <span style={{ fontSize: 12 }}>12.5w</span>
+            <div style={{
+              position: 'absolute',
+              bottom: -4,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 18,
+              height: 18,
+              background: '#FF3B30',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 12,
+              border: '2px solid #000'
+            }}>
+              +
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+
+          {/* 点赞 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <div style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 32,
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+            }}>
+              🤍
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+              {['12.5w', '8.3w', '25.6w', '3.2w', '56.7w'][index % 5]}
+            </span>
+          </div>
+
+          {/* 评论 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <div style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 28,
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+            }}>
               💬
             </div>
-            <span style={{ fontSize: 12 }}>3.2w</span>
+            <span style={{ fontSize: 11, fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+              {['3.2w', '1.1w', '5.8w', '8923', '12.3w'][index % 5]}
+            </span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+
+          {/* 收藏 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <div style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 28,
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+            }}>
               ⭐
             </div>
-            <span style={{ fontSize: 12 }}>收藏</span>
+            <span style={{ fontSize: 11, fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+              收藏
+            </span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+
+          {/* 分享 */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <div style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 26,
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+            }}>
               ↗️
             </div>
-            <span style={{ fontSize: 12 }}>分享</span>
+            <span style={{ fontSize: 11, fontWeight: 500, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+              {['1.5w', '8921', '3.2w', '567', '8.9w'][index % 5]}
+            </span>
+          </div>
+
+          {/* 旋转音乐碟片 */}
+          <div style={{
+            marginTop: 8,
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: '#1a1a1a',
+            border: '4px solid rgba(255,255,255,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 20,
+            animation: 'spin 4s linear infinite'
+          }}>
+            🎵
           </div>
         </div>
 
@@ -274,12 +415,15 @@ export default function Feed({
           <div
             style={{
               position: 'absolute',
-              bottom: 50,
+              bottom: 60,
               left: '50%',
               transform: 'translateX(-50%)',
-              color: 'rgba(255,255,255,0.5)',
+              color: 'rgba(255,255,255,0.6)',
               fontSize: 12,
-              zIndex: 20
+              zIndex: 20,
+              background: 'rgba(0,0,0,0.4)',
+              padding: '4px 12px',
+              borderRadius: 12
             }}
           >
             向上滑动继续 ↑ ({index + 1}/2)
@@ -303,6 +447,13 @@ export default function Feed({
         background: '#000'
       }}
     >
+      {/* 添加旋转动画 */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
       {videos.map((video, index) => renderVideoCard(video, index))}
     </div>
   );
