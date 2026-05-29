@@ -1,12 +1,14 @@
-# BiteBack - 搜索后收藏美食唤醒卡
+# BiteBack - 收藏美食自然唤醒卡
 
 > 抖音 AI 创变者计划 2026·黑客松联赛 - 赛道三｜AI体验：刷到懂你的瞬间
 
 ## 产品简介
 
-BiteBack 是抖音推荐流中的 AI 收藏美食唤醒卡。当用户搜索美食后未完成决策（未打开 POI、未购买团购、未查看路线），15分钟内回到推荐流时，系统用 AI 从其历史收藏中召回高置信、强匹配的美食 POI，生成一张自然出现在 Feed 中的唤醒卡片。
+BiteBack 是抖音 Feed 里的 AI 收藏美食自然唤醒卡。当用户在饭点、外出停留或附近可消费场景刷 Feed 时，系统从他过去收藏过但未到店的美食门店中召回当前可行动的候选，重新组织成一张自然出现、可左右滑动的多页决策卡组。
 
-**核心 slogan**: "你刚搜过晚饭 · 这家你收藏过"
+**核心 slogan**: "你以前收藏过的想吃，现在刚好在附近"
+
+产品判断：收藏不该吃灰。BiteBack 不是附近陌生店推荐，也不是进店推券，而是在 Feed 里把用户曾经 mark 过的美食意愿，四两拨千斤地重新唤醒。
 
 ## 项目结构
 
@@ -25,7 +27,12 @@ BiteBack/
 │   └── reference/
 │       └── douyin-ui/      # 真实抖音界面参考截图，不参与运行时展示
 ├── public/
-│   └── assets/             # Demo 展示素材（图片、视频）
+│   └── assets/             # Demo 运行素材
+│       ├── README.md       # 素材目录与替换说明
+│       ├── food/           # 菜品、饮品、套餐图片
+│       ├── shops/          # 门店外立面、室内、Logo
+│       ├── maps/           # 静态路线图、抽象地图底图
+│       ├── avatars/        # 达人头像、评论头像
 │       ├── covers/
 │       └── videos/
 └── src/
@@ -36,8 +43,9 @@ BiteBack/
     │   └── assets.ts       # 静态素材根路径与路径生成
     ├── mocks/              # 可编辑 Demo 数据
     │   ├── README.md
-    │   ├── user.ts         # 默认用户、搜索会话、Feed 状态
-    │   ├── foodMemories.ts # 收藏美食记忆资产
+    │   ├── assets.ts       # 素材 ID、路径、占位色、用途说明
+    │   ├── user.ts         # 默认用户、当前场景、Feed 状态
+    │   ├── foodMemories.ts # 收藏美食门店记忆资产
     │   ├── feed.ts         # Feed 视频与互动数据
     │   ├── search.ts       # 搜索建议与搜索结果数据
     │   └── index.ts        # Mock 数据统一导出
@@ -68,42 +76,47 @@ npm run build
 
 ## Mock 与资源配置
 
-- Demo 数据统一放在 `src/mocks/`，改搜索词、收藏店铺、Feed 视频、搜索结果都从这里改。
+- Demo 数据统一放在 `src/mocks/`，改当前场景、收藏门店、Feed 视频、候选卡片都从这里改。
 - Demo 素材统一放在 `public/assets/`，不需要启动后端资源服务。
 - 资源路径统一放在 `src/config/assets.ts`，默认指向 `/assets`。
-- 如需切换资源根路径，可设置 `VITE_ASSET_BASE_PATH`，组件内不要直接写具体素材路径。
+- 素材 ID、路径、占位色和用途说明统一放在 `src/mocks/assets.ts`。
+- 如需切换资源根路径，可设置 `VITE_ASSET_BASE_PATH`，组件内不要直接写具体素材路径、地图 URL 或真实图片文件名。
+- 前期没有真实素材时，组件使用 mock asset 的 `placeholderColor` 渲染色块占位。
 - 真实抖音界面截图统一放在 `docs/reference/douyin-ui/`，只作为视觉参考，不放入 demo 素材池。
 
 ## Demo 演示流程
 
 1. 打开应用，进入仿抖音 Feed
-2. 点击右上角"搜索"按钮
-3. 选择"南科大附近晚饭"（或输入其他美食 query）
-4. 在搜索结果页点击"返回 Feed"
-5. 向上滑动 2 条普通视频
-6. 第 3 条位置出现 BiteBack 卡片
-7. 可点击"加入今天"、"看店铺"、"为什么推荐给我"
-8. 可点击右上角"×"进行负反馈
-9. 右侧面板实时显示 Gate 状态和指标变化
-10. 可切换 Control 组对比体验
+2. 预设当前场景：晚饭时间、南科大 / 宝能城附近、外出停留
+3. 向上滑动 2 条普通视频
+4. 第 3 条位置自然出现 BiteBack 多页收藏卡组
+5. Page 1「之前眼馋的，现在能吃上！」展示 1 家主推 + 2 家备选收藏门店
+6. 左右滑到 Page 2 点击“马上开吃”承接行动
+7. 左右滑到 Page 3 查看“怎么吃最顺”
+8. 左右滑到 Page 4 查看“为什么是它们”
+9. 可切换候选店、看路线、打开门店详情、加入今晚
+10. “马上开吃”先展示地点可达和营业确定性，再展示评论区和达人原话
+11. 可点击"不感兴趣"进行负反馈并进入冷却
+12. 右侧面板实时显示 Gate、排序和指标变化
+13. 可切换 Control 组对比体验
 
 ## 六大 Gate
 
-1. **Eligibility Gate** - 准入条件（15分钟回流、美食意图、未转化）
-2. **Attribution Gate** - 归因（搜索链路无转化行为）
-3. **Feed Guardrail Gate** - Feed 护栏（已消费≥2条视频）
-4. **Quality Gate** - 质量（POI置信度≥0.85、营业中）
-5. **Frequency Gate** - 频次（当日未曝光、无负反馈）
-6. **Business Gate** - 商业（店铺质量≥0.75，券不参与排序）
+1. **Memory Gate** - 是否存在可唤醒的 S/A/B 收藏美食门店
+2. **Context Gate** - 当前是否是饭点、外出、停留等可行动场景
+3. **Proximity Gate** - 收藏门店是否在附近可达
+4. **Feed Gate** - Feed 当前是否适合自然插入卡片
+5. **Quality Gate** - POI 置信、营业状态、店铺质量是否可信
+6. **Frequency & Privacy Gate** - 频控、隐私、负反馈是否通过
 
 ## 核心功能
 
 - ✅ 仿抖音 Feed 滑动体验
-- ✅ 搜索入口与意图识别
+- ✅ 饭点/附近/停留场景模拟
 - ✅ 六大 Gate 实时判断与可视化
-- ✅ AI 收藏 POI 召回与排序
-- ✅ BiteBack 卡片（触发原因、视频封面、店铺信息、CTA）
-- ✅ 解释层"为什么推荐给我"
+- ✅ AI 收藏门店召回与多候选排序
+- ✅ BiteBack 多页卡组（之前眼馋的现在能吃上、今晚行动、怎么吃最顺、为什么是它们）
+- ✅ 解释层"为什么出现"
 - ✅ 负反馈与冷却机制
 - ✅ Treatment vs Control 对比
 - ✅ 实时指标面板
@@ -116,11 +129,11 @@ npm run build
 
 ## 不触发场景演示
 
-- 非美食 query（如"猫咪视频"）→ Eligibility Gate 拦截
-- C 级收藏 → 不召回
+- 非饭点 / 居家场景 → Context Gate 拦截
+- 附近没有收藏门店 → Proximity Gate 拦截
+- C 级云收藏 → Memory Gate 拦截
 - 低置信 POI（<0.85）→ Quality Gate 拦截
-- 搜索已转化 → Attribution Gate 拦截
-- 负反馈后 → Frequency Gate 拦截
+- 负反馈后 → Frequency & Privacy Gate 拦截
 
 ## 项目文档
 
