@@ -24,6 +24,26 @@
 3. 在 `src/mocks/foodMemories.ts` 等业务 mock 中引用素材 ID。
 4. 不要在 React 组件里直接写 `/assets/...`。
 
+## BiteBack 卡片素材需求
+
+当前卡片不引用错误图片路径，所有 BiteBack 业务图片位默认使用色块。后续补图时，按素材 ID 填到 `src/mocks/assets.ts`：
+
+| 素材 ID | 建议文件 | 内容要求 | 位置 |
+| --- | --- | --- | --- |
+| `food-hotpot-main` | `food/hotpot-main.jpg` | 铜锅涮羊肉/热乎晚饭近景，画面要有食欲 | P1 主推大图、背景 |
+| `food-dessert-main` | `food/dessert-main.jpg` | 桃喜/饮品/甜品，干净明亮 | P1 备选小图 |
+| `food-fried-rice` | `food/fried-rice.jpg` | 奶龙炒饭/校园餐厅菜品 | P1 备选小图 |
+| `shop-hotpot-front` | `shops/hotpot-front.jpg` | 铜锅涮店外立面或室内环境 | 门店详情 Sheet |
+| `shop-dessert-front` | `shops/dessert-front.jpg` | 桃喜门店外立面或吧台 | 门店详情 Sheet |
+| `shop-campus-canteen` | `shops/campus-canteen.jpg` | 校园餐厅环境 | 门店详情 Sheet |
+| `map-campus-route` | `maps/campus-route.png` | 南科大地铁站到主推店路线图或地图 API 截图 | 路线页、马上开吃 Sheet |
+| `map-dessert-route` | `maps/dessert-route.png` | 饭后顺路去饮品店路线图 | 路线页备用 |
+| `cover-hotpot` | `covers/hotpot-source.jpg` | 原收藏铜锅涮视频封面 | 收藏证据页 |
+| `cover-dessert` | `covers/dessert-source.jpg` | 原收藏甜品/饮品视频封面 | 收藏证据页 |
+| `cover-campus` | `covers/campus-source.jpg` | 原收藏校园饭视频封面 | 收藏证据页 |
+| `creator-avatar-food` | `avatars/creator-food.jpg` | 探店达人头像 | 证据页/后续评论 |
+| `creator-avatar-campus` | `avatars/creator-campus.jpg` | 校园美食作者头像 | 证据页/后续评论 |
+
 ## 地图 API 预留
 
 P0 Demo 不接真实地图 API。若后续接入地图：

@@ -1,18 +1,29 @@
-// BiteBack 类型定义
+// BiteBack type definitions
 
 export type MemoryLevel = 'S' | 'A' | 'B' | 'C';
 
-export type QueryIntent = 'food_decision' | 'other';
+export type TimeLabel = 'lunch' | 'dinner' | 'late_night' | 'other';
+
+export type SceneType = 'metro' | 'taxi' | 'mall' | 'campus' | 'cafe' | 'home';
+
+export type BiteBackDeckPage = 'nearby' | 'action' | 'route' | 'proof';
 
 export type CardState =
-  | 'SEARCH'
-  | 'RETURN_FEED'
-  | 'GATE_CHECK'
-  | 'GATE_BLOCK'
+  | 'FEED_IDLE'
+  | 'CONTEXT_ELIGIBLE'
+  | 'MEMORY_RECALL'
   | 'CARD_QUEUED'
   | 'CARD_EXPOSED'
-  | 'EXPLANATION_OPENED'
-  | 'DECISION_ACTION'
+  | 'DECK_PAGE_CHANGED'
+  | 'CANDIDATE_EXPANDED'
+  | 'REASON_OPENED'
+  | 'START_EATING'
+  | 'ADD_TO_TODAY'
+  | 'ROUTE_INTENT'
+  | 'SHOP_OPEN'
+  | 'SOURCE_VIDEO_OPEN'
+  | 'SHARE_TO_FRIEND'
+  | 'REMIND_LATER'
   | 'NEGATIVE_FEEDBACK'
   | 'COOLDOWN';
 
@@ -20,40 +31,74 @@ export interface UserProfile {
   userId: string;
   locationAuthorized: boolean;
   biteBackExposureToday: number;
-  negativeFeedbackTags: string[];
   closedBiteBack: boolean;
+  negativeFeedbackTags: string[];
+  savedFoodCount: number;
 }
 
-export interface SearchSession {
-  query: string;
-  queryIntent: QueryIntent;
-  searchedAt: number;
-  returnedToFeedAt: number;
-  completedPoiAction: boolean;
-  completedDealAction: boolean;
-  completedRouteAction: boolean;
+export interface CurrentContext {
+  timeLabel: TimeLabel;
+  scene: SceneType;
+  areaName: string;
+  isMealTime: boolean;
+  isOuting: boolean;
+  isStationary: boolean;
+  recentFoodSearch?: string;
 }
 
-export interface FoodMemory {
+export interface RoutePoint {
+  x: number;
+  y: number;
+}
+
+export interface SavedFoodMemory {
   memoryId: string;
-  videoId: string;
-  coverUrl: string;
-  title: string;
-  shopName: string;
   poiId: string;
-  businessArea: string;
+  shopName: string;
   category: string;
-  dishTags: string[];
+  businessArea: string;
+  signatureDishes: string[];
+  heroAssetId: string;
+  shopAssetId: string;
+  mapAssetId: string;
+  sourceVideoAssetId: string;
+  sourceCoverAssetId: string;
+  creatorAvatarAssetId: string;
+  savedDaysAgo: number;
+  sourceTitle: string;
+  creatorName: string;
   memoryLevel: MemoryLevel;
   memoryStrength: number;
   poiConfidence: number;
-  distanceM: number;
-  price: number;
-  isOpen: boolean;
   shopQuality: number;
+  distanceM: number;
+  walkMinutes: number;
+  taxiMinutes: number;
+  pricePerPerson: number;
+  isOpen: boolean;
+  openUntil: string;
   dealAvailable: boolean;
-  lastInteractionDays: number;
+  dealText?: string;
+  reason: string;
+  routeHint: string;
+  routeSummary: string;
+  arrivalText: string;
+  queueRisk: '低' | '中' | '高';
+  routeProvider: 'mock' | 'map_api';
+  routePolylineMock: RoutePoint[];
+  commentProof: string;
+  creatorQuote: string;
+  proofTagline: string;
+  // Legacy fields kept so older non-active components still typecheck.
+  videoId?: string;
+  coverUrl?: string;
+  title?: string;
+  dishTags?: string[];
+  price?: number;
+  lastInteractionDays?: number;
 }
+
+export type FoodMemory = SavedFoodMemory;
 
 export interface FeedVideo {
   id: string;
@@ -85,30 +130,52 @@ export interface FeedState {
   fastSwiping: boolean;
   deepWatching: boolean;
   recentCommercialComponent: boolean;
-  recentPrivacyNegative: boolean;
 }
 
-export interface GateStatus {
-  eligibility: boolean;
-  attribution: boolean;
-  feedGuardrail: boolean;
+export interface BiteBackGateStatus {
+  memory: boolean;
+  context: boolean;
+  proximity: boolean;
+  feed: boolean;
   quality: boolean;
-  frequency: boolean;
-  business: boolean;
+  frequencyPrivacy: boolean;
 }
+
+export type GateStatus = BiteBackGateStatus;
 
 export interface Metrics {
   eligibleUV: number;
   cardExposure: number;
+  deckPageView: number;
+  candidateSelect: number;
   validWake: number;
-  decisionAction: number;
+  startEating: number;
+  addToToday: number;
+  routeIntent: number;
+  shopOpen: number;
+  sourceVideoOpen: number;
+  shareToFriend: number;
+  remindLater: number;
   negativeFeedback: number;
   cooldown: boolean;
 }
 
 export type NegativeFeedbackType =
+  | 'not_today'
   | 'too_far'
-  | 'not_this_category'
   | 'already_visited'
-  | 'wrong_poi'
+  | 'pause_session'
+  | 'wrong_saved_shop'
   | 'close_biteback';
+
+export type QueryIntent = 'food_decision' | 'other';
+
+export interface SearchSession {
+  query: string;
+  queryIntent: QueryIntent;
+  searchedAt: number;
+  returnedToFeedAt: number;
+  completedPoiAction: boolean;
+  completedDealAction: boolean;
+  completedRouteAction: boolean;
+}

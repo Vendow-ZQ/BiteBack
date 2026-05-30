@@ -1,0 +1,89 @@
+{
+  "deck": {
+    "title": "之前眼馋的，\n现在能吃上！",
+    "subtitle": "你收藏过的 {{count}} 家，晚饭刚好顺路",
+    "aiLabel": "AI整理",
+    "continueHint": "⌃ 上滑继续看视频"
+  },
+  "pages": {
+    "nearby": {
+      "locationLabel": "现在位置",
+      "memoryLabel": "收藏命中",
+      "statusLabel": "状态",
+      "statusValue": "晚饭可去",
+      "reasonTemplate": "{{days}} 天前你收藏过。现在离你 {{distance}}，热乎晚饭刚好能兑现。"
+    },
+    "action": {
+      "eyebrow": "今晚行动",
+      "summaryTemplate": "别让它继续在收藏夹吃灰。现在离你 {{distance}}，走过去约 {{minutes}} 分钟。",
+      "addTitle": "加入今晚",
+      "addDesc": "先占一个想吃位",
+      "shareTitle": "发给朋友",
+      "shareDesc": "问一句吃这个吗",
+      "remindTitle": "稍后提醒",
+      "remindDesc": "路上再弹一下",
+      "shopTitle": "看店铺",
+      "shopDesc": "菜品、营业、团购",
+      "dealPrefix": "有可用团购"
+    },
+    "route": {
+      "eyebrow": "怎么吃最顺",
+      "walk": "步行",
+      "taxi": "打车",
+      "queue": "排队",
+      "nextBest": "次优方案",
+      "routeButton": "模拟看路线"
+    },
+    "proof": {
+      "eyebrow": "为什么是它们",
+      "commentSource": "来自你收藏视频的评论区",
+      "creatorSource": "来自探店达人原话"
+    }
+  },
+  "sheet": {
+    "startTitle": "马上开吃",
+    "savedTemplate": "你 {{days}} 天前收藏过 · 招牌：{{dish}}",
+    "openUntil": "营业到 {{time}}",
+    "arrival": "预计到店",
+    "queueRisk": "排队风险",
+    "price": "人均",
+    "proofLabel": "评论区都在说",
+    "dealLabel": "有可用团购",
+    "routeAction": "看路线",
+    "shopAction": "打开店铺",
+    "shareAction": "发给朋友",
+    "youAreHere": "你在这",
+    "minutesToArrive": "{{minutes}} 分钟到"
+  },
+  "buttons": {
+    "notInterested": "不感兴趣",
+    "startEating": "马上开吃",
+    "gotIt": "知道了"
+  },
+  "reasonSheet": {
+    "title": "为什么出现？",
+    "items": [
+      "这几家来自你的美食收藏。",
+      "现在接近晚饭时间。",
+      "它们在 {{area}} 附近可达。",
+      "当前营业，适合现在出发。"
+    ]
+  },
+  "feedback": {
+    "title": "不感兴趣",
+    "items": {
+      "not_today": "今天不想吃这个",
+      "too_far": "太远了",
+      "already_visited": "已经吃过了",
+      "pause_session": "先别打扰我",
+      "wrong_saved_shop": "不是我想收藏的店",
+      "close_biteback": "别再提醒收藏"
+    }
+  },
+  "toast": {
+    "addToToday": "已加入今晚想吃",
+    "share": "已生成给朋友的吃饭卡",
+    "remind": "60 分钟后提醒",
+    "feedback": "已收到反馈"
+  }
+}

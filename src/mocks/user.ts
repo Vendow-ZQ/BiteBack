@@ -1,11 +1,22 @@
-import type { FeedState, SearchSession, UserProfile } from '../types';
+import type { CurrentContext, FeedState, SearchSession, UserProfile } from '../types';
 
 export const defaultUserProfile: UserProfile = {
   userId: 'u_001',
   locationAuthorized: true,
   biteBackExposureToday: 0,
+  closedBiteBack: false,
   negativeFeedbackTags: [],
-  closedBiteBack: false
+  savedFoodCount: 26
+};
+
+export const defaultContext: CurrentContext = {
+  timeLabel: 'dinner',
+  scene: 'campus',
+  areaName: '南科大 / 宝能城',
+  isMealTime: true,
+  isOuting: true,
+  isStationary: true,
+  recentFoodSearch: undefined
 };
 
 export const defaultSearchSession: SearchSession = {
@@ -22,6 +33,5 @@ export const defaultFeedState: FeedState = {
   normalVideosConsumed: 0,
   fastSwiping: false,
   deepWatching: false,
-  recentCommercialComponent: false,
-  recentPrivacyNegative: false
+  recentCommercialComponent: false
 };

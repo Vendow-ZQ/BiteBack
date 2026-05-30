@@ -1,192 +1,171 @@
 import type {
-  UserProfile,
-  SearchSession,
-  FoodMemory,
+  BiteBackGateStatus,
+  CurrentContext,
   FeedState,
-  GateStatus
+  SavedFoodMemory,
+  UserProfile
 } from '../types';
 
-// 检查是否为合格的 Memory（S/A/B 级）
-export function isQualifiedMemory(memory: FoodMemory): boolean {
-  return (
-    ['S', 'A', 'B'].includes(memory.memoryLevel) &&
-    memory.poiConfidence >= 0.85
-  );
+export function isQualifiedMemory(memory: SavedFoodMemory): boolean {
+  return ['S', 'A', 'B'].includes(memory.memoryLevel) && memory.poiConfidence >= 0.85;
 }
 
-// Gate 1: Eligibility Gate
-export function passEligibilityGate(
-  user: UserProfile,
-  search: SearchSession,
-  memories: FoodMemory[]
-): boolean {
-  const within15m = search.returnedToFeedAt - search.searchedAt <= 15 * 60 * 1000;
-  const foodIntent = search.queryIntent === 'food_decision';
-  const noSearchConversion =
-    !search.completedPoiAction &&
-    !search.completedDealAction &&
-    !search.completedRouteAction;
-  const hasQualifiedMemory = memories.some(isQualifiedMemory);
-
-  return (
-    within15m &&
-    foodIntent &&
-    noSearchConversion &&
-    user.locationAuthorized &&
-    user.biteBackExposureToday < 1 &&
-    !user.closedBiteBack &&
-    hasQualifiedMemory
-  );
+export function passMemoryGate(memories: SavedFoodMemory[]): boolean {
+  return memories.some(isQualifiedMemory);
 }
 
-// Gate 2: Attribution Gate
-export function passAttributionGate(search: SearchSession): boolean {
-  return (
-    !search.completedPoiAction &&
-    !search.completedDealAction &&
-    !search.completedRouteAction
-  );
+export function passContextGate(context: CurrentContext): boolean {
+  return context.isMealTime && context.isOuting && context.isStationary;
 }
 
-// Gate 3: Feed Guardrail Gate
-export function passFeedGuardrailGate(feedState: FeedState): boolean {
+export function passProximityGate(memories: SavedFoodMemory[]): boolean {
+  return memories.filter(memory =>
+    memory.distanceM <= 3000 &&
+    memory.walkMinutes <= 20 &&
+    memory.isOpen
+  ).length >= 1;
+}
+
+export function passFeedGate(feedState: FeedState): boolean {
   return (
     feedState.normalVideosConsumed >= 2 &&
     !feedState.fastSwiping &&
     !feedState.deepWatching &&
-    !feedState.recentCommercialComponent &&
-    !feedState.recentPrivacyNegative
+    !feedState.recentCommercialComponent
   );
 }
 
-// Gate 4: Quality Gate
-export function passQualityGate(memory: FoodMemory): boolean {
-  return (
-    memory.poiConfidence >= 0.85 &&
-    memory.isOpen &&
-    memory.shopQuality >= 0.75 &&
-    memory.distanceM <= 3000
-  );
+export function passQualityGate(memory: SavedFoodMemory): boolean {
+  return memory.poiConfidence >= 0.85 && memory.shopQuality >= 0.75 && memory.isOpen;
 }
 
-// Gate 5: Frequency Gate
-export function passFrequencyGate(user: UserProfile, memory: FoodMemory): boolean {
+export function passFrequencyPrivacyGate(user: UserProfile, memory: SavedFoodMemory): boolean {
   return (
+    user.locationAuthorized &&
     user.biteBackExposureToday < 1 &&
+    !user.closedBiteBack &&
     !user.negativeFeedbackTags.includes(memory.poiId)
   );
 }
 
-// Gate 6: Business Gate
-export function passBusinessGate(memory: FoodMemory): boolean {
-  return memory.shopQuality >= 0.75;
-}
-
-// 获取单个 Gate 状态详情
-export function getGateStatus(
-  user: UserProfile,
-  search: SearchSession,
-  memories: FoodMemory[],
-  feedState: FeedState,
-  selectedMemory: FoodMemory | null
-): GateStatus {
-  return {
-    eligibility: passEligibilityGate(user, search, memories),
-    attribution: passAttributionGate(search),
-    feedGuardrail: passFeedGuardrailGate(feedState),
-    quality: selectedMemory ? passQualityGate(selectedMemory) : false,
-    frequency: selectedMemory ? passFrequencyGate(user, selectedMemory) : false,
-    business: selectedMemory ? passBusinessGate(selectedMemory) : false
-  };
-}
-
-// Query-Memory 匹配分数计算
-export function getQueryMatchScore(query: string, memory: FoodMemory): number {
+export function getContextFit(memory: SavedFoodMemory, context: CurrentContext): number {
   let score = 0;
-  const queryLower = query.toLowerCase();
-
-  // 商圈匹配（0.4分）
-  if (queryLower.includes(memory.businessArea.toLowerCase())) score += 0.4;
-
-  // 品类匹配（0.25分）
-  if (queryLower.includes('晚饭') || queryLower.includes(memory.category.toLowerCase())) {
-    score += 0.25;
+  if (context.isMealTime) score += 0.32;
+  if (context.isOuting) score += 0.22;
+  if (context.isStationary) score += 0.16;
+  if (memory.businessArea.includes(context.areaName.split('/')[0].trim())) score += 0.14;
+  if (context.recentFoodSearch) {
+    const query = context.recentFoodSearch;
+    if (query.includes(memory.category) || memory.signatureDishes.some(dish => query.includes(dish))) {
+      score += 0.16;
+    }
   }
-
-  // 店名匹配（0.5分）- 最强
-  if (queryLower.includes(memory.shopName.toLowerCase())) score += 0.5;
-
-  // 菜品匹配（0.25分）
-  if (memory.dishTags.some(tag => queryLower.includes(tag.toLowerCase()))) {
-    score += 0.25;
-  }
-
   return Math.min(score, 1);
 }
 
-// 检查是否通过 Query-Memory 匹配
-export function passQueryMatch(query: string, memory: FoodMemory): boolean {
-  return getQueryMatchScore(query, memory) >= 0.35;
+export function getDiversityFit(memory: SavedFoodMemory, memories: SavedFoodMemory[]): number {
+  const sameCategoryCount = memories.filter(item => item.category === memory.category).length;
+  return sameCategoryCount <= 1 ? 1 : 0.62;
 }
 
-// 排序分数计算
-export function rankMemory(memory: FoodMemory, query: string): number {
-  const queryMatchScore = getQueryMatchScore(query, memory);
-  const distanceFit = Math.max(0, 1 - memory.distanceM / 3000);
+export function rankSavedMemory(
+  memory: SavedFoodMemory,
+  context: CurrentContext,
+  memories: SavedFoodMemory[]
+): number {
+  const proximityFit = Math.max(0, 1 - memory.distanceM / 3000);
   const actionability = memory.isOpen ? 1 : 0;
+  const contextFit = getContextFit(memory, context);
+  const diversityFit = getDiversityFit(memory, memories);
 
   return (
-    memory.memoryStrength * 0.30 +
-    queryMatchScore * 0.25 +
-    memory.poiConfidence * 0.15 +
-    distanceFit * 0.10 +
-    memory.shopQuality * 0.10 +
-    actionability * 0.10
+    memory.memoryStrength * 0.28 +
+    contextFit * 0.2 +
+    proximityFit * 0.18 +
+    memory.poiConfidence * 0.12 +
+    memory.shopQuality * 0.1 +
+    diversityFit * 0.07 +
+    actionability * 0.05
   );
 }
 
-// 选择最佳 Memory
-export function selectBestMemory(
-  memories: FoodMemory[],
-  query: string,
+export function getDisplayableMemories(
+  memories: SavedFoodMemory[],
+  context: CurrentContext,
   user: UserProfile
-): FoodMemory | null {
-  const qualifiedMemories = memories
-    .filter(m =>
-      isQualifiedMemory(m) &&
-      passQualityGate(m) &&
-      passFrequencyGate(user, m) &&
-      passBusinessGate(m) &&
-      passQueryMatch(query, m)
+): SavedFoodMemory[] {
+  return memories
+    .filter(memory =>
+      isQualifiedMemory(memory) &&
+      memory.distanceM <= 3000 &&
+      memory.walkMinutes <= 20 &&
+      passQualityGate(memory) &&
+      passFrequencyPrivacyGate(user, memory)
     )
-    .map(m => ({
-      memory: m,
-      score: rankMemory(m, query)
+    .map(memory => ({
+      memory,
+      score: rankSavedMemory(memory, context, memories)
     }))
-    .sort((a, b) => b.score - a.score);
-
-  return qualifiedMemories.length > 0 ? qualifiedMemories[0].memory : null;
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.memory);
 }
 
-// 检查是否所有 Gate 都通过
-export function allGatesPassed(status: GateStatus): boolean {
-  return (
-    status.eligibility &&
-    status.attribution &&
-    status.feedGuardrail &&
-    status.quality &&
-    status.frequency &&
-    status.business
-  );
+export function selectBiteBackCandidates(
+  memories: SavedFoodMemory[],
+  context: CurrentContext,
+  user: UserProfile
+): SavedFoodMemory[] {
+  const displayable = getDisplayableMemories(memories, context, user);
+  const selected: SavedFoodMemory[] = [];
+  const seenCategories = new Set<string>();
+
+  for (const memory of displayable) {
+    if (selected.length === 0 || !seenCategories.has(memory.category)) {
+      selected.push(memory);
+      seenCategories.add(memory.category);
+    }
+    if (selected.length >= 3) return selected;
+  }
+
+  for (const memory of displayable) {
+    if (!selected.some(item => item.memoryId === memory.memoryId)) {
+      selected.push(memory);
+    }
+    if (selected.length >= 3) break;
+  }
+
+  return selected;
 }
 
-// 获取第一个失败的 Gate 名称
-export function getFirstFailedGate(status: GateStatus): string | null {
-  if (!status.eligibility) return 'Eligibility Gate';
-  if (!status.attribution) return 'Attribution Gate';
-  if (!status.feedGuardrail) return 'Feed Guardrail Gate';
+export function getGateStatus(
+  user: UserProfile,
+  context: CurrentContext,
+  memories: SavedFoodMemory[],
+  feedState: FeedState,
+  candidates: SavedFoodMemory[]
+): BiteBackGateStatus {
+  const primary = candidates[0] ?? null;
+
+  return {
+    memory: passMemoryGate(memories),
+    context: passContextGate(context),
+    proximity: passProximityGate(memories),
+    feed: passFeedGate(feedState),
+    quality: primary ? passQualityGate(primary) : false,
+    frequencyPrivacy: primary ? passFrequencyPrivacyGate(user, primary) : user.locationAuthorized && !user.closedBiteBack
+  };
+}
+
+export function allGatesPassed(status: BiteBackGateStatus): boolean {
+  return Object.values(status).every(Boolean);
+}
+
+export function getFirstFailedGate(status: BiteBackGateStatus): string | null {
+  if (!status.memory) return 'Memory Gate';
+  if (!status.context) return 'Context Gate';
+  if (!status.proximity) return 'Proximity Gate';
+  if (!status.feed) return 'Feed Gate';
   if (!status.quality) return 'Quality Gate';
-  if (!status.frequency) return 'Frequency Gate';
-  if (!status.business) return 'Business Gate';
+  if (!status.frequencyPrivacy) return 'Frequency & Privacy Gate';
   return null;
 }

@@ -821,6 +821,18 @@ P0 不接真实地图 API，但数据结构要预留：
 
 后续接地图 API 时，替换 route provider 和 route data，不改卡片 UI 结构。
 
+### 14.5 文案与素材可编辑契约
+
+Demo 不是一次性静态稿，后续需要产品继续调文案、换素材、接路线。因此 P0 约定：
+
+- 卡片、Sheet、按钮、反馈、Toast 文案放在 `src/mocks/copy.json`。
+- 收藏门店、距离、营业、价格、评论、达人原话放在 `src/mocks/foodMemories.ts`。
+- 素材 ID、占位色、未来真实路径放在 `src/mocks/assets.ts`。
+- 真实图片统一放在 `public/assets/food`、`shops`、`maps`、`covers`、`avatars`。
+- 没有真实素材时只用色块占位，不引用错误图片、不引用抖音参考截图、不引用旧 demo 截图。
+
+这保证 BiteBack 的重点仍然是“收藏夹美食被重新组织成 Feed 决策卡”，而不是靠随便填图撑视觉。
+
 ---
 
 ## 15. 验收标准

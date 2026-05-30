@@ -44,6 +44,7 @@ BiteBack/
     ├── mocks/              # 可编辑 Demo 数据
     │   ├── README.md
     │   ├── assets.ts       # 素材 ID、路径、占位色、用途说明
+    │   ├── copy.json       # 卡片、Sheet、按钮、反馈等可编辑文案
     │   ├── user.ts         # 默认用户、当前场景、Feed 状态
     │   ├── foodMemories.ts # 收藏美食门店记忆资产
     │   ├── feed.ts         # Feed 视频与互动数据
@@ -54,11 +55,14 @@ BiteBack/
     ├── utils/
     │   └── gates.ts        # 六大 Gate 逻辑
     └── components/
-        ├── Feed.tsx        # Feed 主界面
-        ├── BiteBackCard.tsx # BiteBack 卡片
-        ├── SearchPage.tsx  # 搜索页
-        ├── GatePanel.tsx   # Gate 控制台
-        └── MetricsPanel.tsx # 指标面板
+        ├── Feed.tsx              # Feed 主界面
+        ├── BiteBackDeck.tsx      # 多页收藏唤醒卡组
+        ├── StartEatingSheet.tsx  # “马上开吃”路线优先 Sheet
+        ├── AssetBlock.tsx        # 素材 manifest 渲染/占位组件
+        ├── SearchPage.tsx        # 搜索页（辅助加权入口）
+        ├── DebugPanel.tsx        # Gate、候选、指标调试面板
+        ├── GatePanel.tsx         # Gate 控制台
+        └── MetricsPanel.tsx      # 指标面板
 ```
 
 ## 快速启动
@@ -77,12 +81,34 @@ npm run build
 ## Mock 与资源配置
 
 - Demo 数据统一放在 `src/mocks/`，改当前场景、收藏门店、Feed 视频、候选卡片都从这里改。
+- Demo 文案统一放在 `src/mocks/copy.json`，包括卡片标题、副标题、按钮、Sheet、Toast、反馈项；组件内不要硬编码展示文案。
 - Demo 素材统一放在 `public/assets/`，不需要启动后端资源服务。
 - 资源路径统一放在 `src/config/assets.ts`，默认指向 `/assets`。
 - 素材 ID、路径、占位色和用途说明统一放在 `src/mocks/assets.ts`。
 - 如需切换资源根路径，可设置 `VITE_ASSET_BASE_PATH`，组件内不要直接写具体素材路径、地图 URL 或真实图片文件名。
-- 前期没有真实素材时，组件使用 mock asset 的 `placeholderColor` 渲染色块占位。
+- BiteBack 卡片当前默认使用 mock asset 的 `placeholderColor` 渲染色块占位；不要把真实抖音参考截图或旧 demo 截图当作卡片素材。
+- 后续替换真实图片时，只改 `public/assets/` 下的素材文件和 `src/mocks/assets.ts` 的 `path`，不改 React 组件。
 - 真实抖音界面截图统一放在 `docs/reference/douyin-ui/`，只作为视觉参考，不放入 demo 素材池。
+
+## 素材替换清单
+
+当前 BiteBack 卡片里的图片位都先用色块占位。需要真实素材时，按下面路径补图，再到 `src/mocks/assets.ts` 给对应 ID 增加 `path`：
+
+| 素材 ID | 建议文件位置 | 内容要求 | 使用位置 |
+| --- | --- | --- | --- |
+| `food-hotpot-main` | `public/assets/food/hotpot-main.jpg` | 铜锅涮羊肉/热乎晚饭近景，建议 4:3 或 16:10 | P1 主推大图、卡片背景 |
+| `food-dessert-main` | `public/assets/food/dessert-main.jpg` | 桃喜/饮品/甜品图，干净、可识别 | P1 备选小图 |
+| `food-fried-rice` | `public/assets/food/fried-rice.jpg` | 奶龙炒饭/校园餐厅菜品图 | P1 备选小图 |
+| `shop-hotpot-front` | `public/assets/shops/hotpot-front.jpg` | 主推店外立面或室内环境 | 门店 Sheet |
+| `shop-dessert-front` | `public/assets/shops/dessert-front.jpg` | 桃喜门店外立面或吧台 | 门店 Sheet |
+| `shop-campus-canteen` | `public/assets/shops/campus-canteen.jpg` | 校园餐厅环境 | 门店 Sheet |
+| `map-campus-route` | `public/assets/maps/campus-route.png` | 南科大地铁站到主推店的静态路线图或地图 API 截图 | 路线页、马上开吃 Sheet |
+| `map-dessert-route` | `public/assets/maps/dessert-route.png` | 饭后顺路甜品/饮品路线图 | 路线页备用 |
+| `cover-hotpot` | `public/assets/covers/hotpot-source.jpg` | 原收藏铜锅涮视频封面 | “为什么是它们”页 |
+| `cover-dessert` | `public/assets/covers/dessert-source.jpg` | 原收藏饮品/甜品视频封面 | “为什么是它们”页 |
+| `cover-campus` | `public/assets/covers/campus-source.jpg` | 原收藏校园饭视频封面 | “为什么是它们”页 |
+| `creator-avatar-food` | `public/assets/avatars/creator-food.jpg` | 探店达人头像 | 证据页/后续评论区 |
+| `creator-avatar-campus` | `public/assets/avatars/creator-campus.jpg` | 校园美食作者头像 | 证据页/后续评论区 |
 
 ## Demo 演示流程
 

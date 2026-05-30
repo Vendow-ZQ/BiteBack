@@ -12,44 +12,32 @@ export default function MetricsPanel({
   onToggleControl
 }: MetricsPanelProps) {
   const metricItems = [
-    { key: 'eligibleUV', label: 'Eligible UV', value: metrics.eligibleUV },
-    { key: 'cardExposure', label: 'Card Exposure', value: metrics.cardExposure },
-    { key: 'validWake', label: 'Valid Wake', value: metrics.validWake },
-    { key: 'decisionAction', label: 'Decision Action', value: metrics.decisionAction },
-    { key: 'negativeFeedback', label: 'Negative Feedback', value: metrics.negativeFeedback }
+    { label: 'Eligible UV', value: metrics.eligibleUV },
+    { label: 'Card Exposure', value: metrics.cardExposure },
+    { label: 'Deck Page View', value: metrics.deckPageView },
+    { label: 'Candidate Select', value: metrics.candidateSelect },
+    { label: 'Valid Wake', value: metrics.validWake },
+    { label: 'Start Eating', value: metrics.startEating },
+    { label: 'Add To Today', value: metrics.addToToday },
+    { label: 'Route Intent', value: metrics.routeIntent },
+    { label: 'Shop Open', value: metrics.shopOpen },
+    { label: 'Source Video', value: metrics.sourceVideoOpen },
+    { label: 'Share Friend', value: metrics.shareToFriend },
+    { label: 'Remind Later', value: metrics.remindLater },
+    { label: 'Negative', value: metrics.negativeFeedback }
   ];
 
   return (
-    <div
-      style={{
-        background: '#1a1a1a',
-        borderRadius: 12,
-        padding: 16,
-        fontSize: 13,
-        color: '#fff'
-      }}
-    >
-      <div
-        style={{
-          fontSize: 14,
-          fontWeight: 600,
-          marginBottom: 16,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: '#007AFF'
-            }}
-          />
-          指标面板
-        </div>
+    <div style={{ background: '#1a1a1a', borderRadius: 12, padding: 16, fontSize: 13, color: '#fff' }}>
+      <div style={{
+        fontSize: 14,
+        fontWeight: 800,
+        marginBottom: 14,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <span>指标面板</span>
         <button
           onClick={onToggleControl}
           style={{
@@ -65,70 +53,29 @@ export default function MetricsPanel({
           {isControlGroup ? 'Control组' : 'Treatment组'}
         </button>
       </div>
-
-      {/* 分组说明 */}
-      <div
-        style={{
-          background: isControlGroup ? 'rgba(255,255,255,0.05)' : 'rgba(255,59,48,0.1)',
-          padding: '10px 12px',
-          borderRadius: 8,
-          marginBottom: 16,
-          fontSize: 11,
-          lineHeight: 1.5,
-          color: 'rgba(255,255,255,0.7)'
-        }}
-      >
-        {isControlGroup
-          ? 'Control组：搜索后回流用户，不展示 BiteBack，继续普通 Feed'
-          : 'Treatment组：搜索后回流用户，Gate通过后展示 BiteBack 卡片'}
-      </div>
-
-      {/* 指标列表 */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {metricItems.map(item => (
-          <div
-            key={item.key}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '8px 0',
-              borderBottom: '1px solid rgba(255,255,255,0.05)'
-            }}
-          >
-            <span style={{ color: 'rgba(255,255,255,0.7)' }}>{item.label}</span>
-            <span
-              style={{
-                fontWeight: 600,
-                color: item.value > 0 ? '#34C759' : '#fff'
-              }}
-            >
-              {item.value}
-            </span>
+          <div key={item.label} style={{
+            padding: '8px 10px',
+            borderRadius: 8,
+            background: item.value > 0 ? 'rgba(52,199,89,0.12)' : 'rgba(255,255,255,0.05)'
+          }}>
+            <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11 }}>{item.label}</div>
+            <div style={{ marginTop: 5, fontWeight: 900, color: item.value > 0 ? '#34C759' : '#fff' }}>{item.value}</div>
           </div>
         ))}
       </div>
-
-      {/* Cooldown 状态 */}
-      <div
-        style={{
-          marginTop: 12,
-          padding: '10px 12px',
-          background: metrics.cooldown ? 'rgba(255,59,48,0.1)' : 'rgba(52,199,89,0.1)',
-          borderRadius: 8,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
-        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>Cooldown 状态</span>
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            color: metrics.cooldown ? '#FF3B30' : '#34C759'
-          }}
-        >
+      <div style={{
+        marginTop: 12,
+        padding: '10px 12px',
+        background: metrics.cooldown ? 'rgba(255,59,48,0.1)' : 'rgba(52,199,89,0.1)',
+        borderRadius: 8,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>Cooldown</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: metrics.cooldown ? '#FF3B30' : '#34C759' }}>
           {metrics.cooldown ? '冷却中' : '正常'}
         </span>
       </div>

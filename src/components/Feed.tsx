@@ -1,18 +1,28 @@
 import { useRef, useState } from 'react';
-import type { FeedState, FeedVideo, FoodMemory, SearchSession } from '../types';
+import type { BiteBackDeckPage, CurrentContext, FeedVideo, NegativeFeedbackType, SavedFoodMemory } from '../types';
 import { feedEngagements, videoCovers } from '../mocks';
-import BiteBackCard from './BiteBackCard';
+import BiteBackDeck from './BiteBackDeck';
 
 interface FeedProps {
   videos: FeedVideo[];
-  selectedMemory: FoodMemory | null;
+  candidates: SavedFoodMemory[];
+  context: CurrentContext;
   showBiteBack: boolean;
-  searchSession: SearchSession;
-  feedState: FeedState;
   isControlGroup: boolean;
+  selectedIndex: number;
+  activePage: BiteBackDeckPage;
   onVideoConsumed: () => void;
-  onCardAction: (action: 'explanation' | 'add_to_today' | 'view_shop') => void;
-  onNegativeFeedback: (type: string) => void;
+  onSelectCandidate: (index: number) => void;
+  onChangePage: (page: BiteBackDeckPage) => void;
+  onStartEating: (memory: SavedFoodMemory) => void;
+  onAddToToday: (memory: SavedFoodMemory) => void;
+  onRouteIntent: (memory: SavedFoodMemory) => void;
+  onOpenShop: (memory: SavedFoodMemory) => void;
+  onOpenSourceVideo: (memory: SavedFoodMemory) => void;
+  onShareToFriend: (memory: SavedFoodMemory) => void;
+  onRemindLater: (minutes: number) => void;
+  onOpenReason: () => void;
+  onNegativeFeedback: (type: NegativeFeedbackType) => void;
   onSearchClick: () => void;
 }
 
@@ -28,13 +38,23 @@ function isVideoAsset(url?: string): boolean {
 
 export default function Feed({
   videos,
-  selectedMemory,
+  candidates,
+  context,
   showBiteBack,
-  searchSession,
-  feedState: _feedState,
-  isControlGroup: _isControlGroup,
+  isControlGroup,
+  selectedIndex,
+  activePage,
   onVideoConsumed,
-  onCardAction,
+  onSelectCandidate,
+  onChangePage,
+  onStartEating,
+  onAddToToday,
+  onRouteIntent,
+  onOpenShop,
+  onOpenSourceVideo,
+  onShareToFriend,
+  onRemindLater,
+  onOpenReason,
   onNegativeFeedback,
   onSearchClick
 }: FeedProps) {
@@ -47,22 +67,22 @@ export default function Feed({
     setCurrentIndex(nextIndex);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
+  const handleTouchStart = (event: React.TouchEvent) => {
+    touchStartY.current = event.touches[0].clientY;
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const diff = touchStartY.current - e.changedTouches[0].clientY;
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    const diff = touchStartY.current - event.changedTouches[0].clientY;
     if (Math.abs(diff) < 50) return;
     if (diff > 0 && currentIndex < videos.length - 1) moveTo(currentIndex + 1);
     if (diff < 0 && currentIndex > 0) moveTo(currentIndex - 1);
   };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    if (Math.abs(e.deltaY) < 30) return;
-    if (e.deltaY > 0 && currentIndex < videos.length - 1) moveTo(currentIndex + 1);
-    if (e.deltaY < 0 && currentIndex > 0) moveTo(currentIndex - 1);
+  const handleWheel = (event: React.WheelEvent) => {
+    event.preventDefault();
+    if (Math.abs(event.deltaY) < 30) return;
+    if (event.deltaY > 0 && currentIndex < videos.length - 1) moveTo(currentIndex + 1);
+    if (event.deltaY < 0 && currentIndex > 0) moveTo(currentIndex - 1);
   };
 
   const renderMedia = (video: FeedVideo, index: number) => {
@@ -85,12 +105,12 @@ export default function Feed({
     return <img src={coverUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />;
   };
 
-  const renderStandardVideo = (video: FeedVideo, index: number, key = video.id) => {
+  const renderStandardVideo = (video: FeedVideo, index: number) => {
     const engagement = feedEngagements[index % feedEngagements.length];
 
     return (
       <div
-        key={key}
+        key={video.id}
         style={{
           position: 'absolute',
           inset: 0,
@@ -135,7 +155,6 @@ export default function Feed({
             {index === 0 ? '很高兴遇见你' : video.title || '南科大美食探店｜今天吃什么'}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 16, lineHeight: 1.35 }}>
-            <span style={{ fontSize: 19 }}>👋</span>
             <span style={{ opacity: 0.96 }}>{index === 0 ? '拍一拍提醒｜主播邀请大家进房互动' : '原声 - 抖音美食记录'}</span>
           </div>
         </div>
@@ -197,8 +216,7 @@ export default function Feed({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 18,
-              animation: 'spin 4s linear infinite'
+              fontSize: 18
             }}
           >
             ♪
@@ -208,67 +226,65 @@ export default function Feed({
     );
   };
 
-  const renderVideoCard = (video: FeedVideo, index: number) => {
-    if (video.type === 'biteback') {
-      if (showBiteBack && selectedMemory) {
-        return (
+  const renderBiteBackSlot = (video: FeedVideo, index: number) => {
+    const shouldShow = showBiteBack && candidates.length > 0 && !isControlGroup;
+
+    return (
+      <div
+        key={video.id}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          transform: `translateY(${(index - currentIndex) * 100}%)`,
+          transition: 'transform 0.28s ease-out',
+          zIndex: index === currentIndex ? 10 : 1,
+          background: '#000'
+        }}
+      >
+        {shouldShow ? (
+          <BiteBackDeck
+            candidates={candidates}
+            context={context}
+            selectedIndex={selectedIndex}
+            activePage={activePage}
+            onSelectCandidate={onSelectCandidate}
+            onChangePage={onChangePage}
+            onStartEating={onStartEating}
+            onAddToToday={onAddToToday}
+            onRouteIntent={onRouteIntent}
+            onOpenShop={onOpenShop}
+            onOpenSourceVideo={onOpenSourceVideo}
+            onShareToFriend={onShareToFriend}
+            onRemindLater={onRemindLater}
+            onOpenReason={onOpenReason}
+            onNegativeFeedback={onNegativeFeedback}
+          />
+        ) : (
           <div
-            key={video.id}
             style={{
-              position: 'absolute',
-              inset: 0,
-              transform: `translateY(${(index - currentIndex) * 100}%)`,
-              transition: 'transform 0.28s ease-out',
-              zIndex: index === currentIndex ? 10 : 1
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 42,
+              color: '#fff',
+              textAlign: 'center',
+              background: 'linear-gradient(180deg, #101010, #030303)'
             }}
           >
-            <BiteBackCard
-              memory={selectedMemory}
-              searchQuery={searchSession.query}
-              onExplanation={() => onCardAction('explanation')}
-              onAddToToday={() => onCardAction('add_to_today')}
-              onViewShop={() => onCardAction('view_shop')}
-              onNegativeFeedback={onNegativeFeedback}
-            />
+            <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>
+              BiteBack 未触发
+            </div>
+            <div style={{ color: 'rgba(255,255,255,0.62)', fontSize: 14, lineHeight: 1.65 }}>
+              当前 Control 组或 Gate 未通过。
+              <br />
+              按 D 键查看 Memory / Context / Proximity / Feed / Quality / Frequency。
+            </div>
           </div>
-        );
-      }
-
-      // BiteBack 不显示时显示占位符
-      return (
-        <div
-          key={video.id}
-          style={{
-            position: "absolute",
-            inset: 0,
-            transform: `translateY(${(index - currentIndex) * 100}%)`,
-            transition: "transform 0.28s ease-out",
-            zIndex: index === currentIndex ? 10 : 1,
-            background: "#000",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 40
-          }}
-        >
-          <div style={{ fontSize: 48, marginBottom: 20 }}>🍜</div>
-          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, textAlign: "center" }}>
-            BiteBack 未触发
-          </div>
-          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", textAlign: "center", lineHeight: 1.6 }}>
-            这里本该出现收藏美食唤醒卡
-            <br />
-            但当前场景不满足展示条件
-          </div>
-          <div style={{ marginTop: 20, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-            按 D 键查看调试信息
-          </div>
-        </div>
-      );
-    }
-
-    return renderStandardVideo(video, index);
+        )}
+      </div>
+    );
   };
 
   return (
@@ -278,124 +294,128 @@ export default function Feed({
       onWheel={handleWheel}
       style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative', background: '#000' }}
     >
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-      {videos.map((video, index) => renderVideoCard(video, index))}
+      {videos.map((video, index) => (
+        video.type === 'biteback' ? renderBiteBackSlot(video, index) : renderStandardVideo(video, index)
+      ))}
 
-      <div
+      <FeedTopNav onSearchClick={onSearchClick} />
+    </div>
+  );
+}
+
+function FeedTopNav({ onSearchClick }: { onSearchClick: () => void }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 51,
+        left: 0,
+        right: 0,
+        height: 43,
+        zIndex: 70,
+        display: 'flex',
+        alignItems: 'center',
+        color: '#fff',
+        textShadow: '0 1px 2px rgba(0,0,0,0.28)'
+      }}
+    >
+      <button
+        aria-label="菜单"
         style={{
-          position: 'absolute',
-          top: 51,
-          left: 0,
-          right: 0,
-          height: 43,
-          zIndex: 70,
-          display: 'flex',
-          alignItems: 'center',
+          width: 39,
+          flex: '0 0 39px',
+          border: 'none',
+          background: 'transparent',
           color: '#fff',
-          textShadow: '0 1px 2px rgba(0,0,0,0.28)'
+          fontSize: 31,
+          lineHeight: 1,
+          cursor: 'pointer',
+          position: 'relative',
+          padding: 0
         }}
       >
-        <button
-          aria-label="菜单"
+        ≡
+        <span
           style={{
-            width: 45,
-            border: 'none',
-            background: 'transparent',
-            color: '#fff',
-            fontSize: 34,
-            lineHeight: 1,
-            cursor: 'pointer',
-            position: 'relative',
-            padding: 0
+            position: 'absolute',
+              top: -1,
+              right: 3,
+            minWidth: 20,
+            height: 20,
+            borderRadius: '50%',
+            background: '#fe2c55',
+            fontSize: 13,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 800
           }}
         >
-          ≡
+          1
+        </span>
+      </button>
+
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, minWidth: 0 }}>
+        {['团购', '直播', '深圳', '关注', '商城', '推荐'].map(tab => (
           <span
+            key={tab}
             style={{
-              position: 'absolute',
-              top: -1,
-              right: 6,
-              minWidth: 20,
-              height: 20,
-              borderRadius: '50%',
-              background: '#fe2c55',
-              fontSize: 13,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800
+              position: 'relative',
+              fontSize: 17,
+              fontWeight: tab === '推荐' ? 800 : 500,
+              color: tab === '推荐' ? '#fff' : 'rgba(255,255,255,0.72)',
+              whiteSpace: 'nowrap'
             }}
           >
-            1
+            {tab}
+            {tab === '关注' && (
+              <i
+                style={{
+                  position: 'absolute',
+                  top: -7,
+                  right: -9,
+                  width: 9,
+                  height: 9,
+                  borderRadius: '50%',
+                  background: '#fe2c55'
+                }}
+              />
+            )}
+            {tab === '推荐' && (
+              <i
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: -10,
+                  transform: 'translateX(-50%)',
+                  width: 34,
+                  height: 3,
+                  borderRadius: 4,
+                  background: '#fff'
+                }}
+              />
+            )}
           </span>
-        </button>
-
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 9, minWidth: 0 }}>
-          {['团购', '直播', '深圳', '关注', '商城', '推荐'].map(tab => (
-            <span
-              key={tab}
-              style={{
-                position: 'relative',
-                fontSize: 18,
-                fontWeight: tab === '推荐' ? 800 : 500,
-                color: tab === '推荐' ? '#fff' : 'rgba(255,255,255,0.72)',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              {tab}
-              {tab === '关注' && (
-                <i
-                  style={{
-                    position: 'absolute',
-                    top: -7,
-                    right: -9,
-                    width: 9,
-                    height: 9,
-                    borderRadius: '50%',
-                    background: '#fe2c55'
-                  }}
-                />
-              )}
-              {tab === '推荐' && (
-                <i
-                  style={{
-                    position: 'absolute',
-                    left: '50%',
-                    bottom: -10,
-                    transform: 'translateX(-50%)',
-                    width: 34,
-                    height: 3,
-                    borderRadius: 4,
-                    background: '#fff'
-                  }}
-                />
-              )}
-            </span>
-          ))}
-        </div>
-
-        <button
-          onClick={onSearchClick}
-          aria-label="搜索"
-          style={{
-            width: 46,
-            border: 'none',
-            background: 'transparent',
-            color: '#fff',
-            fontSize: 37,
-            lineHeight: 1,
-            cursor: 'pointer',
-            padding: 0
-          }}
-        >
-          ⌕
-        </button>
+        ))}
       </div>
+
+      <button
+        onClick={onSearchClick}
+        aria-label="搜索"
+        style={{
+          width: 38,
+          flex: '0 0 38px',
+          border: 'none',
+          background: 'transparent',
+          color: '#fff',
+          fontSize: 34,
+          lineHeight: 1,
+          cursor: 'pointer',
+          padding: 0
+        }}
+      >
+        ⌕
+      </button>
     </div>
   );
 }
