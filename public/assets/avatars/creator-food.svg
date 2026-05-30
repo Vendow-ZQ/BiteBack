@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Food creator avatar">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="25%" r="75%">
+      <stop offset="0" stop-color="#f4d7b1"/>
+      <stop offset="0.58" stop-color="#d98764"/>
+      <stop offset="1" stop-color="#6d3a32"/>
+    </radialGradient>
+    <linearGradient id="face" x1="0" y1="80" x2="0" y2="330">
+      <stop offset="0" stop-color="#f5bd8e"/>
+      <stop offset="1" stop-color="#d8795d"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#3f1d1a" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="112" cy="104" r="54" fill="#fff1d5" opacity="0.26"/>
+  <circle cx="418" cy="398" r="88" fill="#3f1d1a" opacity="0.16"/>
+  <g filter="url(#soft)">
+    <path d="M156 365c18-70 63-105 101-105s82 35 100 105c-37 32-164 32-201 0z" fill="#4d3330"/>
+    <circle cx="256" cy="190" r="92" fill="url(#face)"/>
+    <path d="M161 184c14-81 65-111 112-104 50 8 78 41 82 105-30-36-74-47-132-38-26 4-46 14-62 37z" fill="#3b2525"/>
+    <circle cx="221" cy="198" r="9" fill="#3a2827"/>
+    <circle cx="291" cy="198" r="9" fill="#3a2827"/>
+    <path d="M229 236c18 17 39 17 56 0" fill="none" stroke="#7e3d34" stroke-width="9" stroke-linecap="round"/>
+    <path d="M173 331c43 31 124 37 176 0l18 84c-62 39-165 40-225 0z" fill="#6f4b45"/>
+    <ellipse cx="260" cy="337" rx="96" ry="42" fill="#fff1d5"/>
+    <ellipse cx="260" cy="329" rx="82" ry="28" fill="#f2c06b"/>
+    <path d="M193 298l145-72" stroke="#5c392f" stroke-width="13" stroke-linecap="round"/>
+    <path d="M202 320l151-78" stroke="#6f4438" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="224" cy="322" r="10" fill="#d24d3f"/>
+    <circle cx="260" cy="318" r="10" fill="#8a9b45"/>
+    <circle cx="296" cy="322" r="10" fill="#d98d38"/>
+  </g>
+</svg>

@@ -193,15 +193,6 @@ export default function App() {
     }));
   };
 
-  const handleAddToToday = () => {
-    setCardState('ADD_TO_TODAY');
-    setMetrics(prev => ({
-      ...prev,
-      addToToday: prev.addToToday + 1,
-      validWake: prev.validWake + 1
-    }));
-  };
-
   const handleRouteIntent = () => {
     setCardState('ROUTE_INTENT');
     setMetrics(prev => ({
@@ -290,7 +281,6 @@ export default function App() {
 
   const typedHandlers = {
     onStartEating: (_memory: SavedFoodMemory) => handleStartEating(),
-    onAddToToday: (_memory: SavedFoodMemory) => handleAddToToday(),
     onRouteIntent: (_memory: SavedFoodMemory) => handleRouteIntent(),
     onOpenShop: (_memory: SavedFoodMemory) => handleOpenShop(),
     onOpenSourceVideo: (_memory: SavedFoodMemory) => handleOpenSourceVideo(),
@@ -349,7 +339,6 @@ export default function App() {
             onSelectCandidate={handleSelectCandidate}
             onChangePage={handleChangePage}
             onStartEating={typedHandlers.onStartEating}
-            onAddToToday={typedHandlers.onAddToToday}
             onRouteIntent={typedHandlers.onRouteIntent}
             onOpenShop={typedHandlers.onOpenShop}
             onOpenSourceVideo={typedHandlers.onOpenSourceVideo}

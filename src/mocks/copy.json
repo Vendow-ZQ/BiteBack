@@ -29,10 +29,19 @@
     "route": {
       "eyebrow": "怎么吃最顺",
       "walk": "步行",
-      "taxi": "打车",
+      "arrival": "到店",
       "queue": "排队",
+      "planLabel": "推荐节奏",
+      "planValue": "先主餐，后顺路",
+      "stepOne": "先出发",
+      "stepTwo": "到店先点",
+      "stepTwoHint": "如果排队风险是",
+      "stepThree": "饭后备选",
+      "returnFeed": "回到推荐流",
+      "returnFeedHint": "吃完不用再纠结下一站",
+      "routeCopy": "这里不是导航页，而是帮你判断怎么吃最省心：先兑现最强收藏，再保留一个顺路备选。",
       "nextBest": "次优方案",
-      "routeButton": "模拟看路线"
+      "routeButton": "采用这个顺序"
     },
     "proof": {
       "eyebrow": "为什么是它们",

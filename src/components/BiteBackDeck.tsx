@@ -15,7 +15,6 @@ interface BiteBackDeckProps {
   onSelectCandidate: (index: number) => void;
   onChangePage: (page: BiteBackDeckPage) => void;
   onStartEating: (memory: SavedFoodMemory) => void;
-  onAddToToday: (memory: SavedFoodMemory) => void;
   onRouteIntent: (memory: SavedFoodMemory) => void;
   onOpenShop: (memory: SavedFoodMemory) => void;
   onOpenSourceVideo: (memory: SavedFoodMemory) => void;
@@ -33,7 +32,6 @@ export default function BiteBackDeck({
   onSelectCandidate,
   onChangePage,
   onStartEating,
-  onAddToToday,
   onRouteIntent,
   onOpenShop,
   onOpenSourceVideo,
@@ -70,11 +68,6 @@ export default function BiteBackDeck({
     setShowStartSheet(true);
   };
 
-  const handleAddToToday = () => {
-    onAddToToday(memory);
-    showToast(copy.toast.addToToday);
-  };
-
   const handleReason = () => {
     onOpenReason();
     setShowReasonSheet(true);
@@ -82,7 +75,12 @@ export default function BiteBackDeck({
 
   const handleOpenShop = (target: SavedFoodMemory) => {
     onOpenShop(target);
+    setShowStartSheet(false);
     setShowShopSheet(true);
+  };
+
+  const handleBuyDeal = () => {
+    showToast('已打开团购券');
   };
 
   const handlePointerDown = (event: React.PointerEvent) => {
@@ -120,46 +118,49 @@ export default function BiteBackDeck({
       </div>
 
       <div className="deckBody">
-        {activePage === 'nearby' && (
-          <NearbyPage
-            memory={memory}
-            candidates={candidates}
-            selectedIndex={selectedIndex}
-            context={context}
-            onSelectCandidate={onSelectCandidate}
-            onReason={handleReason}
-          />
-        )}
-        {activePage === 'action' && (
-          <ActionPage
-            memory={memory}
-            onStartEating={openStartEating}
-            onAddToToday={handleAddToToday}
-            onShare={() => {
-              onShareToFriend(memory);
-              showToast(copy.toast.share);
-            }}
-            onRemind={() => {
-              onRemindLater(60);
-              showToast(copy.toast.remind);
-            }}
-            onOpenShop={() => handleOpenShop(memory)}
-          />
-        )}
-        {activePage === 'route' && (
-          <RoutePage
-            memory={memory}
-            candidates={candidates}
-            onRouteIntent={() => onRouteIntent(memory)}
-          />
-        )}
-        {activePage === 'proof' && (
-          <ProofPage
-            memory={memory}
-            candidates={candidates}
-            onOpenSourceVideo={onOpenSourceVideo}
-          />
-        )}
+        <div
+          className="deckTrack"
+          style={{ transform: `translate3d(-${activePageIndex * 100}%, 0, 0)` }}
+        >
+          <div className="deckSlide">
+            <NearbyPage
+              memory={memory}
+              candidates={candidates}
+              selectedIndex={selectedIndex}
+              context={context}
+              onSelectCandidate={onSelectCandidate}
+              onReason={handleReason}
+            />
+          </div>
+          <div className="deckSlide">
+            <ActionPage
+              memory={memory}
+              onStartEating={openStartEating}
+              onShare={() => {
+                onShareToFriend(memory);
+                showToast(copy.toast.share);
+              }}
+              onRemind={() => {
+                onRemindLater(60);
+                showToast(copy.toast.remind);
+              }}
+            />
+          </div>
+          <div className="deckSlide">
+            <RoutePage
+              memory={memory}
+              candidates={candidates}
+              onRouteIntent={() => onRouteIntent(memory)}
+            />
+          </div>
+          <div className="deckSlide">
+            <ProofPage
+              memory={memory}
+              candidates={candidates}
+              onOpenSourceVideo={onOpenSourceVideo}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="deckBottom">
@@ -183,7 +184,6 @@ export default function BiteBackDeck({
       {showStartSheet && (
         <StartEatingSheet
           memory={memory}
-          onRouteIntent={onRouteIntent}
           onOpenShop={handleOpenShop}
           onShareToFriend={target => {
             onShareToFriend(target);
@@ -198,16 +198,15 @@ export default function BiteBackDeck({
       )}
 
       {showShopSheet && (
-        <ShopSheet memory={memory} onClose={() => setShowShopSheet(false)} onStartEating={openStartEating} />
+        <ShopSheet memory={memory} onClose={() => setShowShopSheet(false)} onBuyDeal={handleBuyDeal} />
       )}
 
       {showFeedbackSheet && (
         <FeedbackSheet
           onClose={() => setShowFeedbackSheet(false)}
           onFeedback={type => {
-            onNegativeFeedback(type);
             setShowFeedbackSheet(false);
-            showToast(copy.toast.feedback);
+            onNegativeFeedback(type);
           }}
         />
       )}
@@ -296,17 +295,13 @@ function NearbyPage({
 function ActionPage({
   memory,
   onStartEating,
-  onAddToToday,
   onShare,
-  onRemind,
-  onOpenShop
+  onRemind
 }: {
   memory: SavedFoodMemory;
   onStartEating: () => void;
-  onAddToToday: () => void;
   onShare: () => void;
   onRemind: () => void;
-  onOpenShop: () => void;
 }) {
   return (
     <div className="actionPage">
@@ -317,11 +312,8 @@ function ActionPage({
         minutes: memory.walkMinutes
       })}</p>
       <button className="actionHeroBtn" onClick={onStartEating}>{copy.buttons.startEating}</button>
+      {memory.dealAvailable && <div className="weakDeal">{copy.pages.action.dealPrefix} · {memory.dealText}</div>}
       <div className="actionGrid">
-        <button onClick={onAddToToday}>
-          <span>{copy.pages.action.addTitle}</span>
-          <strong>{copy.pages.action.addDesc}</strong>
-        </button>
         <button onClick={onShare}>
           <span>{copy.pages.action.shareTitle}</span>
           <strong>{copy.pages.action.shareDesc}</strong>
@@ -330,12 +322,7 @@ function ActionPage({
           <span>{copy.pages.action.remindTitle}</span>
           <strong>{copy.pages.action.remindDesc}</strong>
         </button>
-        <button onClick={onOpenShop}>
-          <span>{copy.pages.action.shopTitle}</span>
-          <strong>{copy.pages.action.shopDesc}</strong>
-        </button>
       </div>
-      {memory.dealAvailable && <div className="weakDeal">{copy.pages.action.dealPrefix} · {memory.dealText}</div>}
     </div>
   );
 }
@@ -356,38 +343,32 @@ function RoutePage({
       <div className="sectionEyebrow">{copy.pages.route.eyebrow}</div>
       <div className="routeStats">
         <div><span>{copy.pages.route.walk}</span><strong>{memory.walkMinutes} 分钟</strong></div>
-        <div><span>{copy.pages.route.taxi}</span><strong>{memory.taxiMinutes} 分钟</strong></div>
+        <div><span>{copy.pages.route.arrival}</span><strong>{memory.arrivalText.replace('现在去预计 ', '')}</strong></div>
         <div><span>{copy.pages.route.queue}</span><strong>{memory.queueRisk}</strong></div>
       </div>
-      <AssetBlock assetId={memory.mapAssetId} className="deckRouteCard">
-        <svg viewBox="0 0 100 82" className="deckRouteSvg" aria-hidden="true">
-          <polyline
-            points={memory.routePolylineMock.map(point => `${point.x},${point.y}`).join(' ')}
-            fill="none"
-            stroke="rgba(255,255,255,0.92)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {memory.routePolylineMock.map((point, index) => (
-            <circle
-              key={`${point.x}-${point.y}`}
-              cx={point.x}
-              cy={point.y}
-              r={index === memory.routePolylineMock.length - 1 ? 5 : 3.5}
-              fill={index === memory.routePolylineMock.length - 1 ? '#ff4d6d' : '#f5f0de'}
-            />
-          ))}
-        </svg>
-      </AssetBlock>
-      <p className="routeCopy">{memory.routeHint}。{memory.arrivalText}，排队风险{memory.queueRisk}。</p>
-      {nextBest && (
-        <div className="nextBest">
-          <span>{copy.pages.route.nextBest}</span>
-          <strong>{nextBest.shopName}</strong>
-          <em>{nextBest.routeSummary}</em>
+      <div className="routePlanCard">
+        <div className="routePlanHeader">
+          <span>{copy.pages.route.planLabel}</span>
+          <strong>{copy.pages.route.planValue}</strong>
         </div>
-      )}
+        <ol className="routeSteps">
+          <li>
+            <span>{copy.pages.route.stepOne}</span>
+            <strong>{memory.routeSummary}</strong>
+            <em>{memory.routeHint}</em>
+          </li>
+          <li>
+            <span>{copy.pages.route.stepTwo}</span>
+            <strong>{memory.signatureDishes[0]}</strong>
+            <em>{copy.pages.route.stepTwoHint} {memory.queueRisk}</em>
+          </li>
+          <li>
+            <span>{copy.pages.route.stepThree}</span>
+            <strong>{nextBest ? nextBest.shopName : copy.pages.route.returnFeed}</strong>
+            <em>{nextBest ? `${nextBest.routeSummary} · ${nextBest.signatureDishes[0]}` : copy.pages.route.returnFeedHint}</em>
+          </li>
+        </ol>
+      </div>
       <button className="routeIntentBtn" onClick={onRouteIntent}>{copy.pages.route.routeButton}</button>
     </div>
   );
@@ -448,28 +429,68 @@ function ReasonSheet({ context, onClose }: { context: CurrentContext; onClose: (
 function ShopSheet({
   memory,
   onClose,
-  onStartEating
+  onBuyDeal
 }: {
   memory: SavedFoodMemory;
   onClose: () => void;
-  onStartEating: () => void;
+  onBuyDeal: () => void;
 }) {
+  const shopOffers = [
+    ...(memory.dealAvailable && memory.dealText
+      ? [{
+        label: '券',
+        title: memory.dealText,
+        desc: '到店前可先锁券，适合现在出发'
+      }]
+      : []),
+    {
+      label: '套餐',
+      title: `${memory.signatureDishes[0]} 单人餐`,
+      desc: `约 ¥${memory.pricePerPerson} / 人 · ${memory.openUntil} 前可用`
+    },
+    {
+      label: '推荐',
+      title: memory.signatureDishes.join(' + '),
+      desc: memory.reason
+    }
+  ];
+
   return (
     <div className="sheetScrim" onClick={onClose}>
       <div className="plainSheet shopSheet" onClick={event => event.stopPropagation()}>
         <div className="sheetHandle" />
-        <AssetBlock assetId={memory.shopAssetId} label={memory.shopName} className="shopHero" />
-        <h3>{memory.shopName}</h3>
-        <div className="shopFacts">
-          <span>{memory.category}</span>
-          <span>{memory.businessArea}</span>
-          <span>人均 ¥{memory.pricePerPerson}</span>
-          <span>营业到 {memory.openUntil}</span>
+        <div className="sheetTopline">
+          <span>打开店铺</span>
+          <button onClick={onClose} aria-label="关闭">×</button>
         </div>
-        <p>推荐：{memory.signatureDishes.join(' / ')}</p>
-        <p>{memory.reason}</p>
-        {memory.dealAvailable && <div className="dealStrip"><span>有可用团购</span><strong>{memory.dealText}</strong></div>}
-        <button onClick={onStartEating}>{copy.buttons.startEating}</button>
+
+        <section className="shopPurchaseHero">
+          <AssetBlock assetId={memory.shopAssetId} label={memory.shopName} className="shopHero" />
+          <div className="shopPurchaseCopy">
+            <h3>{memory.shopName}</h3>
+            <div className="shopFacts">
+              <span>{memory.category}</span>
+              <span>{memory.businessArea}</span>
+              <span>营业到 {memory.openUntil}</span>
+            </div>
+            <p>{memory.routeSummary} · 人均 ¥{memory.pricePerPerson}</p>
+          </div>
+        </section>
+
+        <button className="buyDealBtn" onClick={onBuyDeal}>马上购券</button>
+
+        <section className="offerList">
+          <div className="sectionLabel">券与套餐</div>
+          {shopOffers.map(offer => (
+            <div className="offerItem" key={`${offer.label}-${offer.title}`}>
+              <span>{offer.label}</span>
+              <div>
+                <strong>{offer.title}</strong>
+                <em>{offer.desc}</em>
+              </div>
+            </div>
+          ))}
+        </section>
       </div>
     </div>
   );
@@ -573,12 +594,27 @@ const deckStyles = `
     z-index: 4;
     overflow: hidden;
   }
+  .deckTrack {
+    display: flex;
+    height: 100%;
+    transition: transform 0.3s cubic-bezier(0.2, 0.82, 0.2, 1);
+    will-change: transform;
+  }
+  .deckSlide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+  }
   .nearbyPage, .actionPage, .routePage, .proofPage {
     height: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
     min-height: 0;
+  }
+  .routePage {
+    gap: 6px;
   }
   .factRail {
     display: grid;
@@ -607,14 +643,16 @@ const deckStyles = `
     display: grid;
     grid-template-columns: 1.55fr 0.78fr;
     gap: 8px;
-    min-height: 154px;
+    height: clamp(154px, 22vh, 188px);
+    min-height: 0;
   }
   .heroFood, .miniFood {
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.12);
   }
   .heroFood {
-    min-height: 154px;
+    min-height: 0;
+    height: 100%;
   }
   .heroOverlay {
     position: absolute;
@@ -636,7 +674,9 @@ const deckStyles = `
   }
   .miniFoodGrid {
     display: grid;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 8px;
+    min-height: 0;
   }
   .miniFood {
     position: relative;
@@ -646,6 +686,7 @@ const deckStyles = `
     background: transparent;
     color: #fff;
     cursor: pointer;
+    min-height: 0;
   }
   .miniFood span {
     position: absolute;
@@ -734,6 +775,7 @@ const deckStyles = `
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
+    margin-top: auto;
   }
   .actionGrid button {
     min-height: 60px;
@@ -771,7 +813,7 @@ const deckStyles = `
     gap: 7px;
   }
   .routeStats div, .certaintyGrid div {
-    padding: 9px 10px;
+    padding: 8px 10px;
     border-radius: 8px;
     background: rgba(0,0,0,0.24);
     border: 1px solid rgba(255,255,255,0.1);
@@ -783,6 +825,75 @@ const deckStyles = `
     min-height: 98px;
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.12);
+  }
+  .routePlanCard {
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.24);
+    padding: 8px;
+  }
+  .routePlanHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .routePlanHeader span {
+    color: rgba(255,255,255,0.56);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .routePlanHeader strong {
+    font-size: 16px;
+  }
+  .routeSteps {
+    list-style: none;
+    display: grid;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+  }
+  .routeSteps li {
+    position: relative;
+    min-height: 40px;
+    padding: 6px 8px 6px 40px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.07);
+    overflow: hidden;
+  }
+  .routeSteps li::before {
+    content: counter(list-item);
+    position: absolute;
+    left: 9px;
+    top: 8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(254,44,85,0.9);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .routeSteps span, .routeSteps em {
+    display: block;
+    color: rgba(255,255,255,0.58);
+    font-size: 11px;
+    font-style: normal;
+    line-height: 1.3;
+  }
+  .routeSteps strong {
+    display: block;
+    margin: 2px 0;
+    font-size: 14px;
+    line-height: 1.22;
+  }
+  .routePage .routeIntentBtn {
+    height: 34px;
+    font-size: 15px;
+    box-shadow: 0 8px 18px rgba(254,44,85,0.2);
   }
   .deckRouteSvg, .routeSvg {
     position: absolute;
@@ -938,6 +1049,9 @@ const deckStyles = `
     padding: 10px;
     box-shadow: 0 -18px 36px rgba(0,0,0,0.44);
   }
+  .startSheet, .shopSheet {
+    min-height: 590px;
+  }
   .startSheet::-webkit-scrollbar, .plainSheet::-webkit-scrollbar {
     width: 0;
     height: 0;
@@ -1055,7 +1169,7 @@ const deckStyles = `
     position: sticky;
     bottom: 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 7px;
     margin-top: 10px;
     padding-top: 8px;
@@ -1082,16 +1196,32 @@ const deckStyles = `
     line-height: 1.7;
     font-size: 14px;
   }
+  .shopPurchaseHero {
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    gap: 10px;
+    align-items: stretch;
+    margin-bottom: 10px;
+  }
   .shopHero {
-    height: 126px;
+    height: 112px;
     border-radius: 8px;
-    margin-bottom: 12px;
+  }
+  .shopPurchaseCopy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .shopPurchaseCopy h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    line-height: 1.16;
   }
   .shopFacts {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .shopFacts span {
     padding: 5px 7px;
@@ -1105,6 +1235,56 @@ const deckStyles = `
     color: rgba(255,255,255,0.76);
     line-height: 1.45;
     font-size: 14px;
+  }
+  .buyDealBtn {
+    width: 100%;
+    height: 46px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #fe2c55;
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(254,44,85,0.28);
+    margin-bottom: 10px;
+  }
+  .offerList {
+    display: grid;
+    gap: 8px;
+  }
+  .offerItem {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    gap: 9px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.07);
+  }
+  .offerItem > span {
+    width: 42px;
+    height: 24px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    background: rgba(254,44,85,0.16);
+    color: #ffccd6;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .offerItem strong {
+    display: block;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+  .offerItem em {
+    display: block;
+    margin-top: 4px;
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    line-height: 1.35;
+    font-style: normal;
   }
   .feedbackSheet button {
     width: 100%;

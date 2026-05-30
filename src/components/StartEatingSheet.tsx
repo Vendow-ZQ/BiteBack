@@ -5,7 +5,6 @@ import AssetBlock from './AssetBlock';
 
 interface StartEatingSheetProps {
   memory: SavedFoodMemory;
-  onRouteIntent: (memory: SavedFoodMemory) => void;
   onOpenShop: (memory: SavedFoodMemory) => void;
   onShareToFriend: (memory: SavedFoodMemory) => void;
   onClose: () => void;
@@ -13,7 +12,6 @@ interface StartEatingSheetProps {
 
 export default function StartEatingSheet({
   memory,
-  onRouteIntent,
   onOpenShop,
   onShareToFriend,
   onClose
@@ -107,7 +105,6 @@ export default function StartEatingSheet({
         )}
 
         <div className="sheetActions">
-          <button onClick={() => onRouteIntent(memory)}>{copy.sheet.routeAction}</button>
           <button onClick={() => onOpenShop(memory)}>{copy.sheet.shopAction}</button>
           <button onClick={() => onShareToFriend(memory)}>{copy.sheet.shareAction}</button>
         </div>

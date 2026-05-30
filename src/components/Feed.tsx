@@ -15,7 +15,6 @@ interface FeedProps {
   onSelectCandidate: (index: number) => void;
   onChangePage: (page: BiteBackDeckPage) => void;
   onStartEating: (memory: SavedFoodMemory) => void;
-  onAddToToday: (memory: SavedFoodMemory) => void;
   onRouteIntent: (memory: SavedFoodMemory) => void;
   onOpenShop: (memory: SavedFoodMemory) => void;
   onOpenSourceVideo: (memory: SavedFoodMemory) => void;
@@ -48,7 +47,6 @@ export default function Feed({
   onSelectCandidate,
   onChangePage,
   onStartEating,
-  onAddToToday,
   onRouteIntent,
   onOpenShop,
   onOpenSourceVideo,
@@ -149,10 +147,10 @@ export default function Feed({
             </span>
           )}
           <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, textShadow: '0 1px 3px rgba(0,0,0,0.45)' }}>
-            {index === 0 ? '@AAA-画材批发-薯总' : `@${video.id}`}
+            @{video.id}
           </div>
           <div style={{ fontSize: 17, lineHeight: 1.45, marginBottom: 10, textShadow: '0 1px 3px rgba(0,0,0,0.45)' }}>
-            {index === 0 ? '很高兴遇见你' : video.title || '南科大美食探店｜今天吃什么'}
+            {video.title || '南科大美食探店｜今天吃什么'}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 16, lineHeight: 1.35 }}>
             <span style={{ opacity: 0.96 }}>{index === 0 ? '拍一拍提醒｜主播邀请大家进房互动' : '原声 - 抖音美食记录'}</span>
@@ -228,6 +226,11 @@ export default function Feed({
 
   const renderBiteBackSlot = (video: FeedVideo, index: number) => {
     const shouldShow = showBiteBack && candidates.length > 0 && !isControlGroup;
+    const handleNegativeFeedback = (type: NegativeFeedbackType) => {
+      const nextIndex = Math.min(index + 1, videos.length - 1);
+      if (nextIndex !== currentIndex) moveTo(nextIndex);
+      window.setTimeout(() => onNegativeFeedback(type), 300);
+    };
 
     return (
       <div
@@ -250,14 +253,13 @@ export default function Feed({
             onSelectCandidate={onSelectCandidate}
             onChangePage={onChangePage}
             onStartEating={onStartEating}
-            onAddToToday={onAddToToday}
             onRouteIntent={onRouteIntent}
             onOpenShop={onOpenShop}
             onOpenSourceVideo={onOpenSourceVideo}
             onShareToFriend={onShareToFriend}
             onRemindLater={onRemindLater}
             onOpenReason={onOpenReason}
-            onNegativeFeedback={onNegativeFeedback}
+            onNegativeFeedback={handleNegativeFeedback}
           />
         ) : (
           <div
